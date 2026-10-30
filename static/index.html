@@ -1,0 +1,1123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NIFTY LAB · NIFTY 50 Options Analytics</title>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("nifty-dashboard-theme")||"light"}catch(e){document.documentElement.dataset.theme="light"}</script>
+<style>
+/* NIFTY LAB — reference-inspired visual system: editorial white, ink-black and electric violet */
+:root{
+ color-scheme:light;
+ --app-bg:#f8f8fc;--surface:#ffffff;--surface-2:#fbfaff;--surface-3:#f0edff;
+ --app-line:#e5e2ef;--app-text:#191820;--app-muted:#6b687b;--app-subtle:#9692a5;
+ --app-accent:#6546f5;--app-accent-strong:#4d31d9;--app-accent-soft:#f0ebff;
+ --app-teal:#177db4;--app-teal-soft:#eaf5ff;--app-violet:#7752e8;--app-violet-soft:#f1eaff;
+ --app-green:#16805f;--app-green-soft:#e7f7ef;--app-red:#b93459;--app-red-soft:#fff0f4;
+ --app-amber:#94631d;--app-amber-soft:#fff5df;--app-shadow:0 8px 26px rgba(31,24,62,.045);
+ --app-shadow-raised:0 15px 40px rgba(31,24,62,.085);--focus-ring:rgba(101,70,245,.22);
+ --chart-grid:#e8e4f1;--chart-label:#777286;--chart-line:#6546f5;
+ --radius-sm:9px;--radius-md:14px;--radius-lg:19px;--radius-xl:24px;
+ --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;
+}
+html[data-theme="dark"]{
+ color-scheme:dark;
+ --app-bg:#0b0a10;--surface:#121118;--surface-2:#181620;--surface-3:#22202d;
+ --app-line:#302c3d;--app-text:#f5f3fb;--app-muted:#b4b0c6;--app-subtle:#898499;
+ --app-accent:#a18bff;--app-accent-strong:#b7a8ff;--app-accent-soft:#28213f;
+ --app-teal:#76caff;--app-teal-soft:#162a38;--app-violet:#c2a8ff;--app-violet-soft:#2a213b;
+ --app-green:#73d6b1;--app-green-soft:#172e28;--app-red:#ff9db5;--app-red-soft:#36202b;
+ --app-amber:#f0c17a;--app-amber-soft:#332919;--app-shadow:0 10px 30px rgba(0,0,0,.2);
+ --app-shadow-raised:0 18px 46px rgba(0,0,0,.28);--focus-ring:rgba(161,139,255,.28);
+ --chart-grid:#302c3d;--chart-label:#aaa5bb;--chart-line:#a18bff;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--app-bg);scroll-padding-top:95px}
+body{margin:0;min-height:100vh;background:var(--app-bg);color:var(--app-text);font:14px/1.58 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;transition:background-color .18s ease,color .18s ease}
+button,input,select,textarea{font:inherit}button{color:inherit}button:disabled{opacity:.55;cursor:not-allowed!important;transform:none!important;box-shadow:none!important}
+:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}
+::selection{background:var(--app-accent-soft);color:var(--app-text)}
+.app-shell{display:block;min-height:100vh}
+/* Horizontal workspace navigation */
+ .sidebar{position:sticky;top:0;z-index:80;display:flex;align-items:center;justify-content:space-between;gap:clamp(16px,2.8vw,38px);width:100%;padding:10px clamp(16px,3.4vw,48px);background:color-mix(in srgb,var(--surface) 96%,transparent);border-bottom:1px solid var(--app-line);box-shadow:0 3px 22px rgba(25,18,48,.035);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.side-brand{display:flex;align-items:center;gap:11px;flex:none;min-width:150px}
+.side-logo{display:grid;grid-template-columns:repeat(2,7px);grid-template-rows:repeat(2,7px);place-content:center;gap:3px;width:38px;height:38px;border:1px solid color-mix(in srgb,var(--app-accent) 13%,var(--app-line));border-radius:12px;background:var(--surface);box-shadow:0 4px 12px rgba(87,58,212,.07)}
+.side-logo span{display:block;width:7px;height:7px;border-radius:50%;background:#6546f5}.side-logo span:nth-child(2){background:#9985ff}.side-logo span:nth-child(3){background:#f05287}.side-logo span:nth-child(4){background:#4897f6}
+.side-brand strong{display:block;color:var(--app-text);font-size:13px;font-weight:850;letter-spacing:.015em;line-height:1.25}
+.side-brand small{display:block;margin-top:3px;color:var(--app-muted);font-size:10px;line-height:1.2}
+.nav-caption,.sidebar-bottom{display:none}
+.sidebar>div:nth-child(2){display:flex;align-items:center;justify-content:flex-end;flex:1;min-width:0}
+.side-nav{display:flex;align-items:center;justify-content:flex-end;gap:clamp(8px,1.6vw,24px);min-width:0;flex:1}
+.nav-item{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:54px;padding:8px 3px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:var(--app-muted);font-size:12px;font-weight:680;white-space:nowrap;cursor:pointer;box-shadow:none;appearance:none;transition:color .15s,border-color .15s}
+.nav-item:hover{background:transparent;border-color:transparent;color:var(--app-text);box-shadow:none;transform:none}
+.nav-item.active{background:transparent;border-color:transparent;border-bottom-color:var(--app-accent);color:var(--app-accent-strong);box-shadow:none}
+.nav-icon{display:inline-grid;place-items:center;width:18px;font-size:15px;line-height:1;color:currentColor}
+.nav-label{display:block;font-size:12px}
+html[data-theme="dark"] .sidebar{background:color-mix(in srgb,var(--surface) 95%,transparent);box-shadow:0 4px 22px rgba(0,0,0,.18)}
+/* Page frame and title */
+ .app-main{width:min(100%,1580px);min-width:0;margin:0 auto;padding:clamp(18px,2.5vw,36px) clamp(14px,3.3vw,48px) 48px}
+.app-topbar{position:relative;isolation:isolate;display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:126px;margin:0 0 23px;padding:clamp(22px,2.6vw,32px) clamp(18px,2.7vw,34px);overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:22px;background:linear-gradient(112deg,#121118 0%,#1a1726 47%,#25204d 100%);box-shadow:0 16px 38px rgba(38,26,82,.12)}
+.app-topbar:before{content:"";position:absolute;z-index:-1;top:-155px;right:10%;width:430px;height:330px;border-radius:50%;background:radial-gradient(circle,rgba(108,77,255,.34) 0%,rgba(108,77,255,.12) 35%,transparent 70%);pointer-events:none}
+.app-topbar:after{content:"";position:absolute;z-index:-1;right:-80px;bottom:-170px;width:390px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(41,113,255,.18) 0%,transparent 68%);pointer-events:none}
+.page-heading{min-width:0;position:relative;z-index:1}.page-heading:before{content:"NIFTY LAB  /  MARKET WORKSPACE";display:block;margin:0 0 8px;color:#b7a8ff;font-size:9px;font-weight:800;letter-spacing:.17em;line-height:1.4}
+.page-heading h1{margin:0;color:#fff;font-size:clamp(27px,2.8vw,36px);line-height:1.15;letter-spacing:-.045em;font-weight:780}
+.page-heading p{margin:8px 0 0;color:rgba(247,245,255,.72);font-size:12px;line-height:1.55;max-width:760px}
+.topbar-actions{position:relative;z-index:1;display:flex;align-items:center;gap:9px;flex:none}
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:9px 14px;border:1px solid rgba(255,255,255,.23);border-radius:11px;background:rgba(255,255,255,.07);color:#fff;font-size:12px;font-weight:750;white-space:nowrap;cursor:pointer;box-shadow:none;transition:background .15s,border-color .15s}
+.theme-toggle:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.42);transform:none;box-shadow:none}
+.mobile-brand{display:none}.app-main header.top{display:none}
+.page-view{display:none;min-width:0}.page-view.active{display:block;animation:pageIn .16s ease-out}
+@keyframes pageIn{from{opacity:.65;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+ .page-intro{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 16px}
+.page-intro h2{display:none;margin:0;color:var(--app-text);font-size:16px;font-weight:760;letter-spacing:-.025em}
+.page-intro p{margin:0;color:var(--app-muted);font-size:12px;line-height:1.55}
+/* Shared surfaces */
+ .panel{min-width:0;margin:0 0 17px;padding:clamp(17px,1.8vw,25px);background:var(--surface);border:1px solid var(--app-line);border-radius:var(--radius-lg);box-shadow:var(--app-shadow)}
+.panel .panel{margin:15px 0;padding:16px;background:var(--surface-2);box-shadow:none;border-radius:var(--radius-md)}
+.panel:hover{border-color:color-mix(in srgb,var(--app-accent) 12%,var(--app-line))}
+h2{color:var(--app-text);font-size:17px;line-height:1.35;letter-spacing:-.025em;font-weight:760}
+h3{margin:0 0 14px;color:var(--app-text);font-size:15px;font-weight:740;letter-spacing:-.015em}
+.sectionhead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 14px}
+.sectionhead h2{margin:0}.sectionhead p{margin:5px 0 0}
+.eyebrow{margin:0 0 5px;color:var(--app-muted);font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}
+.sub,.muted{color:var(--app-muted)}.muted{font-size:12px;line-height:1.55}.sub{margin-top:5px;font-size:12px}
+.step-chip,.pill,.table-count,.atm-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border:1px solid var(--app-line);border-radius:999px;background:var(--surface-2);color:var(--app-muted);font-size:10px;font-weight:800;line-height:1.4}
+.pill:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--app-green);flex:none}
+.hidden,[hidden]{display:none!important}
+/* Forms and controls */
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;min-width:0}
+.grid .wide{grid-column:1/-1}
+label{display:block;margin:0 0 7px;color:var(--app-muted);font-size:11px;font-weight:750;line-height:1.4}
+input,select,textarea{display:block;width:100%;min-width:0;min-height:44px;padding:10px 13px;border:1px solid var(--app-line);border-radius:11px;background:var(--surface-2);color:var(--app-text);font-size:13px;line-height:1.45;outline:none;transition:border-color .15s,box-shadow .15s,background .15s}
+input:hover,select:hover,textarea:hover{border-color:var(--app-subtle)}
+input:focus,select:focus,textarea:focus{border-color:var(--app-accent);background:var(--surface);box-shadow:0 0 0 3px var(--focus-ring)}
+input::placeholder,textarea::placeholder{color:var(--app-subtle)}input:disabled,select:disabled{opacity:.65;cursor:not-allowed}
+input[type=file]{padding:7px 9px;font-size:12px}input[type=file]::file-selector-button{margin-right:10px;padding:6px 9px;border:0;border-radius:7px;background:var(--app-accent-soft);color:var(--app-accent-strong);font-weight:700;cursor:pointer}
+.field-hint{margin-top:6px;color:var(--app-muted);font-size:11px;line-height:1.55}
+.info-field{display:flex;align-items:center;gap:11px;min-height:64px;padding:12px 13px;border:1px solid var(--app-line);border-radius:var(--radius-md);background:var(--surface-2);color:var(--app-muted)}
+.info-icon{display:grid;place-items:center;width:35px;height:35px;flex:none;border:1px solid var(--app-line);border-radius:10px;background:var(--surface);color:var(--app-accent);font-size:17px;font-weight:800}
+.info-field strong{display:block;color:var(--app-text);font-size:12px;font-weight:750}.info-field small{display:block;margin-top:3px;color:var(--app-muted);font-size:11px;line-height:1.55}
+button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:10px 15px;border:1px solid var(--app-accent);border-radius:11px;background:linear-gradient(115deg,var(--app-accent),color-mix(in srgb,var(--app-accent) 78%,#8f6dff));color:#fff;font-size:12px;font-weight:760;line-height:1.35;white-space:normal;cursor:pointer;box-shadow:0 5px 14px color-mix(in srgb,var(--app-accent) 18%,transparent);transition:transform .14s,background .14s,border-color .14s,box-shadow .14s}
+button:hover{background:var(--app-accent-strong);border-color:var(--app-accent-strong);transform:translateY(-1px);box-shadow:0 7px 18px color-mix(in srgb,var(--app-accent) 22%,transparent)}
+button.secondary{background:var(--surface);border-color:var(--app-line);color:var(--app-text);box-shadow:none}button.secondary:hover{background:var(--surface-3);border-color:color-mix(in srgb,var(--app-accent) 35%,var(--app-line));box-shadow:none}
+button.teal{background:var(--app-teal);border-color:var(--app-teal);color:#fff}
+.actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:16px}
+.status,.notice,.source-box,.calc-note{border:1px solid var(--app-line);border-radius:var(--radius-md);background:var(--surface-2);color:var(--app-muted);font-size:12px;line-height:1.65;overflow-wrap:anywhere}
+.status{margin-top:14px;padding:12px 14px;white-space:pre-wrap;border-left:3px solid var(--app-accent)}
+ .notice{margin:0 0 20px;padding:13px 16px;background:var(--surface);border-color:var(--app-line);border-left:3px solid var(--app-accent);font-weight:520;box-shadow:0 3px 14px rgba(31,24,62,.025)}
+.source-box{display:flex;align-items:flex-start;gap:10px;margin-top:14px;padding:12px 14px}
+.source-dot{display:inline-block;width:8px;height:8px;margin-top:6px;border-radius:50%;background:var(--app-green);flex:none}
+.calc-note{margin:13px 0 0;padding:12px 14px;border-style:dashed}.calc-note strong{color:var(--app-text)}
+/* Metric and level cards */
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;min-width:0}
+ .metric{min-width:0;padding:16px 17px;border:1px solid var(--app-line);border-radius:var(--radius-md);background:linear-gradient(180deg,var(--surface) 0%,var(--surface-2) 100%);box-shadow:none;transition:border-color .15s,transform .15s}
+.metric:hover{border-color:color-mix(in srgb,var(--app-accent) 28%,var(--app-line));transform:translateY(-1px)}
+.metric small{display:block;color:var(--app-muted);font-size:10px;font-weight:760;letter-spacing:.045em;line-height:1.45;text-transform:uppercase}
+.metric strong{display:block;margin-top:7px;color:var(--app-text);font-size:clamp(17px,1.7vw,23px);font-weight:760;line-height:1.25;letter-spacing:-.035em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.metric:nth-child(4n+1),.metric:nth-child(4n+2),.metric:nth-child(4n+3),.metric:nth-child(4n+4){border-top:1px solid var(--app-line)}
+.sr-panel{position:relative;overflow:hidden;background:var(--surface)}.sr-panel:before{display:none}
+.sr-intro,.bep-intro{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.sr-intro h2,.bep-intro h2{margin:0;font-size:19px}.sr-intro p,.bep-intro p{margin:5px 0 0;color:var(--app-muted);font-size:12px}
+.sr-legend{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.legend-pill{display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border:1px solid var(--app-line);border-radius:999px;font-size:10px;font-weight:800;line-height:1.3}
+.legend-pill.support{background:var(--app-red-soft);border-color:color-mix(in srgb,var(--app-red) 18%,var(--app-line));color:var(--app-red)}
+.legend-pill.resistance{background:var(--app-green-soft);border-color:color-mix(in srgb,var(--app-green) 18%,var(--app-line));color:var(--app-green)}
+.level-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;min-width:0}
+ .level-card{position:relative;min-width:0;padding:17px;border:1px solid var(--app-line);border-radius:var(--radius-md);background:var(--surface);color:var(--app-text);overflow:hidden;box-shadow:0 4px 15px rgba(31,24,62,.025)}
+.level-card:after{display:none}.level-card .level-top{display:flex;align-items:center;justify-content:space-between;gap:7px}
+.level-code{font-size:11px;font-weight:850;letter-spacing:.04em}.level-kind{padding:4px 7px;border:1px solid var(--app-line);border-radius:999px;background:var(--surface);color:var(--app-muted);font-size:9px;font-weight:800}
+.level-value{position:relative;margin:14px 0 9px;font-size:clamp(20px,2vw,28px);font-weight:790;line-height:1.2;letter-spacing:-.04em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.level-formula{font-size:11px;font-weight:700;line-height:1.5;overflow-wrap:anywhere}.level-math{position:relative;margin-top:9px;padding-top:9px;border-top:1px solid var(--app-line);color:var(--app-muted);font-size:10px;line-height:1.55;overflow-wrap:anywhere}
+.level-card.s1{background:color-mix(in srgb,var(--app-red-soft) 55%,var(--surface));border-color:color-mix(in srgb,var(--app-red) 22%,var(--app-line));color:var(--app-red)}
+.level-card.s2{background:color-mix(in srgb,var(--app-amber-soft) 54%,var(--surface));border-color:color-mix(in srgb,var(--app-amber) 22%,var(--app-line));color:var(--app-amber)}
+.level-card.r1{background:color-mix(in srgb,var(--app-green-soft) 56%,var(--surface));border-color:color-mix(in srgb,var(--app-green) 22%,var(--app-line));color:var(--app-green)}
+.level-card.r2{background:color-mix(in srgb,var(--app-teal-soft) 54%,var(--surface));border-color:color-mix(in srgb,var(--app-teal) 22%,var(--app-line));color:var(--app-teal)}
+.level-card .level-math{color:var(--app-muted)}
+html[data-theme="dark"] .page-view[data-page="historical-sr"] .panel[style*="background"]{background:var(--surface-2)!important}
+html[data-theme="dark"] .level-card.s1{background:color-mix(in srgb,var(--app-red-soft) 70%,var(--surface))}html[data-theme="dark"] .level-card.s2{background:color-mix(in srgb,var(--app-amber-soft) 70%,var(--surface))}html[data-theme="dark"] .level-card.r1{background:color-mix(in srgb,var(--app-green-soft) 70%,var(--surface))}html[data-theme="dark"] .level-card.r2{background:color-mix(in srgb,var(--app-teal-soft) 70%,var(--surface))}
+/* Contract, OHLC and BEP components */
+.hlc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
+.hlc-card{min-width:0;padding:16px;border:1px solid var(--app-line);border-radius:var(--radius-md);background:var(--surface-2)}
+.hlc-card.call{border-top:3px solid var(--app-teal)}.hlc-card.put{border-top:3px solid var(--app-violet)}
+.hlc-title{display:flex;align-items:center;gap:10px;margin-bottom:14px}.hlc-title strong{display:block;color:var(--app-text);font-size:19px;font-weight:770;font-variant-numeric:tabular-nums}.hlc-title small{display:block;margin-top:2px;color:var(--app-muted);font-size:10px}
+.side-pill{display:inline-grid;place-items:center;min-width:37px;height:35px;padding:0 9px;border:1px solid var(--app-line);border-radius:10px;font-size:11px;font-weight:850}
+.ce-pill{background:var(--app-teal-soft);color:var(--app-teal);border-color:color-mix(in srgb,var(--app-teal) 25%,var(--app-line))}.pe-pill{background:var(--app-violet-soft);color:var(--app-violet);border-color:color-mix(in srgb,var(--app-violet) 25%,var(--app-line))}
+.ohlc-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.ohlc-cell{padding:10px;border:1px solid var(--app-line);border-radius:9px;background:var(--surface)}.ohlc-cell small{display:block;color:var(--app-muted);font-size:9px;font-weight:750;text-transform:uppercase}.ohlc-cell strong{display:block;margin-top:5px;color:var(--app-text);font-size:13px;font-weight:750;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.atm-badge{background:var(--app-amber-soft);border-color:color-mix(in srgb,var(--app-amber) 20%,var(--app-line));color:var(--app-amber)}
+.bep-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin-bottom:14px}.bep-metric{padding:13px;border:1px solid var(--app-line);border-radius:var(--radius-md);background:var(--surface-2)}.bep-metric small{display:block;color:var(--app-muted);font-size:10px;font-weight:760}.bep-metric strong{display:block;margin-top:5px;font-size:19px;font-weight:770;font-variant-numeric:tabular-nums}
+.bep-calc-note,.formulanote{margin:12px 0;padding:14px;border:1px solid var(--app-line);border-radius:var(--radius-md);background:var(--surface-2);color:var(--app-muted);font-size:12px;line-height:1.65}.bep-calc-note strong,.formulanote strong{color:var(--app-text)}.bep-empty{margin:12px 0;padding:14px;border:1px dashed var(--app-line);border-radius:var(--radius-md);color:var(--app-muted);background:var(--surface-2)}
+.formula-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:13px}.formula-chip{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--app-line);border-radius:10px;background:var(--surface);color:var(--app-muted);font-size:12px;line-height:1.55}.formula-chip span{display:inline-grid;place-items:center;min-width:38px;padding:4px 6px;border-radius:7px;background:var(--app-accent-soft);color:var(--app-accent-strong);font-size:10px;font-weight:850}
+/* Data tables — controlled density, sticky headings, scroll within the panel */
+.table-top{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}.table-top h2{margin:0}.table-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}.table-tools input{width:min(230px,100%);min-height:38px}.table-tools button{min-height:38px;padding:8px 11px}.table-count{flex:none}
+.tablewrap,.bep-table-wrap{width:100%;max-width:100%;overflow:auto;border:1px solid var(--app-line);border-radius:var(--radius-md);background:var(--surface);overscroll-behavior-x:contain}
+table{width:100%;border-collapse:separate;border-spacing:0;color:var(--app-text);font-size:12px;font-variant-numeric:tabular-nums}
+th,td{padding:11px 13px;border-bottom:1px solid var(--app-line);text-align:left;vertical-align:middle}
+th{position:sticky;top:0;z-index:2;background:var(--surface-3);color:var(--app-text);font-size:10px;font-weight:820;letter-spacing:.035em;white-space:nowrap}
+td{color:var(--app-text);font-size:12px}tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--surface-2) 74%,var(--surface))}tbody tr:hover td{background:var(--app-accent-soft)}tbody tr:last-child td{border-bottom:0}
+.ce-col,.ce-group{color:var(--app-teal)}.pe-col,.pe-group{color:var(--app-violet)}.bep-col{color:var(--app-accent)}
+.hlc-row td,.hlc-bep-row td{background:var(--app-amber-soft)!important}.close-cell{font-weight:800}.group-row td{background:var(--surface-3)!important;font-weight:800}.strike-head{font-weight:800;white-space:nowrap}
+.table-note{margin:11px 0 0;font-size:11px}.sr-bar{height:7px;margin:10px 0;background:var(--surface-3);border-radius:999px;overflow:hidden}.sr-bar span{display:block;height:100%;border-radius:inherit;background:var(--app-accent);min-width:0}
+/* Historical reaction visualization */
+.fixed-visual-bars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-top:13px}
+.fixed-visual-row{min-width:0;padding:13px;border:1px solid var(--app-line);border-radius:var(--radius-md);background:var(--surface-2)}
+.fixed-visual-row.best{border-color:color-mix(in srgb,var(--app-amber) 50%,var(--app-line));background:color-mix(in srgb,var(--app-amber-soft) 40%,var(--surface))}
+.fixed-visual-label{display:flex;justify-content:space-between;align-items:baseline;gap:8px;color:var(--app-text);font-size:12px;font-weight:740}.fixed-visual-pct{font-size:14px;font-weight:840;font-variant-numeric:tabular-nums;white-space:nowrap}
+.fixed-visual-track{height:9px;margin-top:10px;border-radius:999px;background:var(--surface-3);overflow:hidden}.fixed-visual-fill{height:100%;border-radius:inherit;background:var(--app-accent);transition:width .25s ease}.fixed-visual-row.best .fixed-visual-fill{background:var(--app-amber)}
+/* Keep the historical canvas readable in both themes */
+#niftySpotLevelsCanvas{max-width:100%;border:1px solid var(--app-line);border-radius:var(--radius-md);background:var(--surface)}
+/* Refined theme-safe accents used by the reference-inspired fintech visual language */
+html[data-theme="dark"] .notice{background:var(--surface);border-left-color:var(--app-accent);box-shadow:none}
+html[data-theme="dark"] .metric{background:linear-gradient(180deg,var(--surface) 0%,var(--surface-2) 100%)}
+html[data-theme="dark"] .panel{box-shadow:0 10px 28px rgba(0,0,0,.12)}
+html[data-theme="dark"] .panel:hover{border-color:color-mix(in srgb,var(--app-accent) 22%,var(--app-line))}
+html[data-theme="dark"] .side-logo{background:var(--surface-2);border-color:var(--app-line);box-shadow:none}
+html[data-theme="dark"] .fixed-visual-row.best{background:color-mix(in srgb,var(--app-amber-soft) 45%,var(--surface));border-color:color-mix(in srgb,var(--app-amber) 35%,var(--app-line))}
+button:focus-visible,.nav-item:focus-visible,.theme-toggle:focus-visible{outline:3px solid var(--focus-ring);outline-offset:3px}
+/* Small polish for native disclosure */
+details summary{color:var(--app-text)}details[open] summary{margin-bottom:6px}
+/* Responsive — use real mobile layouts, not scaled-down desktop */
+@media(max-width:1120px){.sidebar{gap:15px;padding-left:18px;padding-right:18px}.side-brand{min-width:130px}.side-nav{gap:clamp(8px,1vw,15px)}.nav-item{padding:8px 2px;gap:5px}.nav-label{font-size:11px}.app-main{padding-left:22px;padding-right:22px}.grid{gap:12px}}
+@media(max-width:850px){.sidebar{display:block;padding:10px 12px 7px}.side-brand{display:flex;margin-bottom:6px}.sidebar>div:nth-child(2){display:block}.side-nav{display:flex;justify-content:flex-start;gap:clamp(17px,4vw,28px);overflow-x:auto;overflow-y:hidden;padding:0 0 2px;scrollbar-width:thin;scroll-snap-type:x proximity}.nav-item{flex:0 0 auto;min-width:unset;min-height:44px;padding:7px 2px;scroll-snap-align:start}.app-main{padding:19px 15px 34px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.grid .wide{grid-column:1/-1}.cards,.level-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.app-topbar{margin-bottom:18px}.page-heading h1{font-size:25px}}
+@media(max-width:560px){html{scroll-padding-top:125px}.sidebar{padding:9px 10px 6px}.side-brand{margin-bottom:6px;gap:9px}.side-logo{width:33px;height:33px;border-radius:10px}.side-brand strong{font-size:12px}.side-brand small{font-size:9px}.side-nav{gap:19px}.nav-item{min-width:65px;min-height:47px;flex-direction:column;gap:4px;padding:5px 2px;border-radius:0}.nav-icon{width:auto;font-size:16px}.nav-label{font-size:9px;line-height:1.2}.app-main{padding:15px 10px 26px}.app-topbar{align-items:flex-start;gap:10px;padding:19px 15px;margin-bottom:16px;border-radius:17px;min-height:0}.app-topbar:before{right:-110px}.page-heading{min-width:0}.page-heading:before{font-size:8px;letter-spacing:.12em;margin-bottom:6px}.page-heading h1{font-size:22px;letter-spacing:-.035em}.page-heading p{font-size:10px;max-width:235px}.theme-toggle{min-height:35px;padding:7px 9px;font-size:10px;gap:5px}.page-intro{margin-bottom:13px}.page-intro h2{font-size:15px}.page-intro p{font-size:11px}.panel{padding:13px;margin-bottom:12px;border-radius:14px}.panel .panel{padding:12px;margin:11px 0}.sectionhead{align-items:flex-start;margin-bottom:12px}.sectionhead h2{font-size:15px}.grid{grid-template-columns:minmax(0,1fr);gap:12px}.grid .wide{grid-column:1}.cards,.level-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.metric{padding:12px}.metric small{font-size:9px}.metric strong{font-size:17px}.level-card{padding:12px}.level-value{font-size:20px;margin:12px 0 8px}.level-formula{font-size:10px}.level-math{font-size:9px}.info-field{align-items:flex-start;padding:10px}.info-icon{width:30px;height:30px}.info-field small{font-size:10px}.actions{gap:7px}.actions button{flex:0 0 auto;max-width:100%;padding:9px 11px;font-size:11px}.status,.notice,.source-box,.calc-note{font-size:11px;padding:11px 12px}.hlc-grid{grid-template-columns:1fr;gap:10px}.ohlc-grid{gap:5px}.ohlc-cell{padding:8px}.ohlc-cell strong{font-size:12px}.bep-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.formula-row{grid-template-columns:1fr}.fixed-visual-bars{grid-template-columns:1fr}.table-top{align-items:flex-start}.table-tools{width:100%}.table-tools input{flex:1;width:auto;min-width:120px}.table-tools button{flex:1}th,td{padding:9px 10px;font-size:11px}th{font-size:9px}.table-count{font-size:9px}.sr-legend{gap:5px}#niftySpotLevelsCanvas{height:320px!important}}
+@media(max-width:360px){.app-main{padding-left:8px;padding-right:8px}.page-heading h1{font-size:20px}.theme-toggle{padding:6px 7px;font-size:9px}.nav-item{min-width:61px;padding:5px 2px}.cards,.level-grid{gap:6px}.metric{padding:10px}.metric strong{font-size:15px}.level-card{padding:10px}.level-value{font-size:18px}.bep-summary{grid-template-columns:1fr 1fr}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* V6 polish: static fetch actions, strong table grid, semantic market colors */
+#resultTable,#bepTable,#srStatsTable,#srEventsTable,#srNseLevelsTable,#fixedEventsTable{border-collapse:separate;border-spacing:0;table-layout:auto}
+#resultTable th,#bepTable th,#srStatsTable th,#srEventsTable th,#srNseLevelsTable th,#fixedEventsTable th{border-right:1px solid color-mix(in srgb,var(--app-line) 85%,#8998b2);border-bottom:2px solid color-mix(in srgb,var(--app-line) 85%,#8998b2);background:linear-gradient(180deg,var(--surface-3),color-mix(in srgb,var(--surface-3) 76%,var(--app-accent-soft)));}
+#resultTable td,#bepTable td,#srStatsTable td,#srEventsTable td,#srNseLevelsTable td,#fixedEventsTable td{border-right:1px solid color-mix(in srgb,var(--app-line) 78%,#9aa7bc);border-bottom:1px solid color-mix(in srgb,var(--app-line) 88%,#9aa7bc)}
+#resultTable th:last-child,#resultTable td:last-child,#bepTable th:last-child,#bepTable td:last-child,#srStatsTable th:last-child,#srStatsTable td:last-child,#srEventsTable th:last-child,#srEventsTable td:last-child,#srNseLevelsTable th:last-child,#srNseLevelsTable td:last-child,#fixedEventsTable th:last-child,#fixedEventsTable td:last-child{border-right:0}
+#resultTable tbody td:nth-child(n+11),#bepTable tbody td:nth-child(3){color:var(--app-red,#d83a4e);font-weight:700}
+#resultTable thead th:nth-child(n+11){color:var(--app-red,#d83a4e)}
+#bepTable thead th:nth-child(3){color:var(--app-red,#d83a4e)}
+#resultTable tbody tr:hover td,#bepTable tbody tr:hover td{box-shadow:inset 0 1px color-mix(in srgb,var(--app-accent) 25%,transparent),inset 0 -1px color-mix(in srgb,var(--app-accent) 25%,transparent)}
+.page-view[data-page="session"] .panel{overflow:visible}
+#fetchForm .actions{position:static!important;inset:auto!important;transform:none!important}
+@media(max-width:900px){#fetchForm>.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}}
+@media(max-width:600px){#fetchForm>.grid{grid-template-columns:minmax(0,1fr);gap:12px}#fetchForm .actions button{flex:1 1 135px}}
+
+
+/* v10: neatly grouped Data Session workflow */
+.session-form{display:grid;gap:16px}
+.session-group{border:1px solid var(--app-line);border-radius:14px;padding:16px;background:color-mix(in srgb,var(--surface-2) 72%,transparent)}
+.session-group-head{display:flex;align-items:center;gap:11px;margin-bottom:15px}
+.session-step{display:grid;place-items:center;flex:0 0 34px;height:34px;border-radius:10px;background:var(--app-accent-soft);color:var(--app-accent-strong);font-size:11px;font-weight:850;letter-spacing:.04em}
+.session-group-head strong{display:block;font-size:13px;color:var(--text-primary,var(--text))}
+.session-group-head small{display:block;margin-top:3px;color:var(--muted);font-size:11px;line-height:1.4}
+#fetchForm .session-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+#fetchForm .session-grid>div{min-width:0}
+#fetchForm .session-grid input,#fetchForm .session-grid select{width:100%;min-width:0;box-sizing:border-box}
+#fetchForm .session-grid .info-field{height:100%;box-sizing:border-box}
+.session-note{padding:0 2px}
+.session-actions{padding-top:4px;border-top:1px solid var(--app-line)}
+@media(max-width:900px){#fetchForm .session-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.session-group{padding:12px}.session-group-head{margin-bottom:12px}#fetchForm .session-grid{grid-template-columns:minmax(0,1fr);gap:12px}}
+
+/* v8 polish: hide verbose exchange archive diagnostics from the form */
+#expiryHint{display:none!important}
+#spotChartWindow{width:100%;accent-color:var(--app-accent-strong);cursor:ew-resize}
+#spotChartWindowLabel{float:right;color:var(--app-accent-strong);font-weight:800}
+
+</style>
+
+<style id="nifty-v3-polish">
+:root{--v3-indigo:#6d5ce8;--v3-teal:#0b9e91;--v3-amber:#d78a22;--v3-rose:#d94f79;--v3-blue:#3478df;--v3-green:#26866b;--v3-shadow:0 10px 24px rgba(20,31,58,.09),0 2px 5px rgba(20,31,58,.06)}
+body{background:radial-gradient(ellipse at 8% 0%,rgba(109,92,232,.055),transparent 32%),radial-gradient(ellipse at 95% 12%,rgba(11,158,145,.055),transparent 30%),var(--bg,#f5f7fb)}
+.panel,.metric,.level-card,.hlc-card,.bep-metric{border-radius:14px!important;box-shadow:var(--v3-shadow)!important;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;transform-style:preserve-3d}
+.panel:hover,.metric:hover,.hlc-card:hover{box-shadow:0 14px 28px rgba(20,31,58,.12),0 4px 9px rgba(20,31,58,.07)!important}
+.page-view[data-page="session"] .panel{border-top:3px solid var(--v3-indigo)!important}
+.page-view[data-page="overview"] .panel,.page-view[data-page="overview"] .metric{border-top-color:var(--v3-teal)!important}
+.page-view[data-page="contracts"] .panel{border-top:3px solid var(--v3-blue)!important}
+.page-view[data-page="analytics"] .panel{border-top:3px solid var(--v3-amber)!important}
+.page-view[data-page="historical-sr"] .panel{border-top:3px solid var(--v3-rose)!important}
+.page-view[data-page="guide"] .panel{border-top:3px solid var(--v3-green)!important}
+#resultTable,#bepTable,#srStatsTable,#srEventsTable,#srNseLevelsTable{border-collapse:separate!important;border-spacing:0 4px!important}
+#resultTable thead th,#bepTable thead th,#srStatsTable thead th,#srEventsTable thead th,#srNseLevelsTable thead th{position:sticky;top:0;z-index:2;box-shadow:inset 0 -2px rgba(255,255,255,.22);letter-spacing:.025em}
+#resultTable tbody tr,#bepTable tbody tr,#srStatsTable tbody tr,#srEventsTable tbody tr,#srNseLevelsTable tbody tr{filter:drop-shadow(0 2px 2px rgba(22,34,60,.055));transition:transform .14s ease,filter .14s ease}
+#resultTable tbody tr:hover,#bepTable tbody tr:hover,#srStatsTable tbody tr:hover,#srEventsTable tbody tr:hover,#srNseLevelsTable tbody tr:hover{transform:translateY(-1px);filter:drop-shadow(0 5px 5px rgba(22,34,60,.12))}
+#resultTable tbody td,#bepTable tbody td,#srStatsTable tbody td,#srEventsTable tbody td,#srNseLevelsTable tbody td{border-top:1px solid rgba(124,140,170,.14);border-bottom:1px solid rgba(124,140,170,.14);padding-top:10px;padding-bottom:10px;background:var(--surface,#fff)}
+#resultTable tbody td:first-child,#bepTable tbody td:first-child,#srStatsTable tbody td:first-child,#srEventsTable tbody td:first-child,#srNseLevelsTable tbody td:first-child{border-left:1px solid rgba(124,140,170,.16);border-radius:8px 0 0 8px;font-weight:750}
+#resultTable tbody td:last-child,#bepTable tbody td:last-child,#srStatsTable tbody td:last-child,#srEventsTable tbody td:last-child,#srNseLevelsTable tbody td:last-child{border-right:1px solid rgba(124,140,170,.16);border-radius:0 8px 8px 0}
+.table-tools{gap:8px;flex-wrap:wrap}.strike-picker-label{font-size:11px;font-weight:800;color:var(--text,#243047);white-space:nowrap}#strikePicker{min-width:125px;max-width:180px;height:34px;padding:5px 8px;border:1px solid rgba(109,92,232,.32);border-radius:9px;background:var(--surface,#fff);color:var(--text,#243047);box-shadow:inset 0 1px 2px rgba(20,31,58,.05),0 3px 0 rgba(109,92,232,.1);font-weight:700}#strikePicker:focus{outline:2px solid rgba(109,92,232,.25);outline-offset:2px}
+#resetStrikePicker{border-radius:9px;box-shadow:0 3px 0 rgba(70,83,110,.13)}button{transition:transform .12s ease,box-shadow .12s ease}button:active{transform:translateY(1px)}
+.chart-depth-stage{perspective:1100px;padding:4px 4px 30px}.chart-depth-frame{height:100%;border-radius:12px;overflow:hidden;border:1px solid rgba(92,111,155,.25);background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(231,237,249,.78));box-shadow:0 14px 0 -6px rgba(73,88,133,.12),0 22px 30px rgba(26,39,70,.12),inset 0 1px rgba(255,255,255,.95);transform:rotateX(1.2deg);transform-origin:center bottom}.chart-depth-caption{position:absolute;left:10px;bottom:0;color:var(--muted,#69758b);font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+html[data-theme="dark"] .chart-depth-frame{background:linear-gradient(145deg,#182132,#101724);box-shadow:0 14px 0 -6px rgba(0,0,0,.25),0 22px 30px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.07)}
+html[data-theme="dark"] #resultTable tbody td,html[data-theme="dark"] #bepTable tbody td,html[data-theme="dark"] #srStatsTable tbody td,html[data-theme="dark"] #srEventsTable tbody td,html[data-theme="dark"] #srNseLevelsTable tbody td{background:var(--surface-2,#192333)}
+@media(max-width:700px){.table-tools{align-items:stretch}.strike-picker-label{align-self:center}#strikePicker{flex:1;min-width:115px}.chart-depth-frame{transform:none}.chart-depth-stage{padding-bottom:25px}}
+@media(prefers-reduced-motion:reduce){.panel,.metric,.hlc-card,#resultTable tbody tr,button{transition:none!important}}
+</style>
+
+
+<style id="nifty-v4-premium-system">
+:root{
+ --app-bg:#edf2fb;--surface:#fbfdff;--surface-2:#f3f6fd;--surface-3:#e7edf8;--app-line:#d6e0f0;
+ --app-text:#17233e;--app-muted:#60708c;--app-subtle:#8d9bb4;--app-accent:#5b63ea;--app-accent-strong:#454bd0;--app-accent-soft:#e9ebff;
+ --app-teal:#078f88;--app-teal-soft:#e0f7f3;--app-violet:#7467e8;--app-violet-soft:#eeebff;--app-green:#138363;--app-green-soft:#e2f7ed;
+ --app-red:#c5456d;--app-red-soft:#ffedf2;--app-amber:#a66d15;--app-amber-soft:#fff3d9;--app-shadow:0 10px 28px rgba(26,44,85,.065);
+ --app-shadow-raised:0 22px 52px rgba(26,44,85,.13),0 5px 14px rgba(26,44,85,.07);--focus-ring:rgba(91,99,234,.28);--chart-grid:#dce5f3;--chart-label:#60708c;--chart-line:#5b63ea;
+ --v4-rim:rgba(255,255,255,.82);--v4-accent-glow:rgba(91,99,234,.12)
+}
+html[data-theme="dark"]{
+ --app-bg:#080f1e;--surface:#101a2c;--surface-2:#142139;--surface-3:#1b2a43;--app-line:#293a58;
+ --app-text:#f1f5ff;--app-muted:#aab9d5;--app-subtle:#7f91b1;--app-accent:#9da8ff;--app-accent-strong:#bac2ff;--app-accent-soft:#273252;
+ --app-teal:#56d7ca;--app-teal-soft:#123b3c;--app-violet:#b9a8ff;--app-violet-soft:#302951;--app-green:#63d5a9;--app-green-soft:#153a31;
+ --app-red:#ff9db9;--app-red-soft:#422238;--app-amber:#f3c674;--app-amber-soft:#3b3020;--app-shadow:0 12px 32px rgba(0,0,0,.2);
+ --app-shadow-raised:0 24px 60px rgba(0,0,0,.36),0 6px 16px rgba(0,0,0,.2);--focus-ring:rgba(157,168,255,.35);--chart-grid:#263752;--chart-label:#aab9d5;--chart-line:#9da8ff;
+ --v4-rim:rgba(255,255,255,.065);--v4-accent-glow:rgba(157,168,255,.15)
+}
+html{background:var(--app-bg)}
+body{background:radial-gradient(ellipse at 6% -6%,rgba(91,99,234,.14),transparent 34%),radial-gradient(ellipse at 96% 12%,rgba(7,143,136,.11),transparent 30%),radial-gradient(ellipse at 53% 100%,rgba(116,103,232,.07),transparent 40%),var(--app-bg);background-attachment:fixed;color:var(--app-text)}
+.sidebar{background:color-mix(in srgb,var(--surface) 88%,transparent);border-bottom:1px solid color-mix(in srgb,var(--app-line) 86%,transparent);box-shadow:0 8px 30px rgba(20,36,72,.08);backdrop-filter:blur(22px)}
+.side-logo{position:relative;overflow:hidden;border-color:color-mix(in srgb,var(--app-accent) 24%,var(--app-line));background:linear-gradient(145deg,var(--surface),var(--app-accent-soft));box-shadow:inset 0 1px var(--v4-rim),0 6px 16px var(--v4-accent-glow)}
+.side-brand strong{letter-spacing:.08em}.side-brand small{letter-spacing:.015em}
+.side-nav{gap:clamp(5px,1vw,15px)}
+.nav-item{min-height:43px;padding:8px 11px;border:1px solid transparent;border-radius:12px;transition:transform .22s ease,background .22s ease,color .22s ease,box-shadow .22s ease;}
+.nav-item:hover{background:var(--surface-2);color:var(--app-text);transform:translateY(-2px);box-shadow:0 5px 12px rgba(19,35,74,.07)}
+.nav-item.active{background:linear-gradient(135deg,var(--app-accent-soft),color-mix(in srgb,var(--app-teal-soft) 44%,var(--app-accent-soft)));border:1px solid color-mix(in srgb,var(--app-accent) 25%,var(--app-line));border-bottom:1px solid color-mix(in srgb,var(--app-accent) 25%,var(--app-line));color:var(--app-accent-strong);box-shadow:inset 0 1px var(--v4-rim),0 5px 14px var(--v4-accent-glow)}
+.nav-item.active:before{content:"";width:5px;height:5px;border-radius:50%;background:var(--app-teal);box-shadow:0 0 0 4px color-mix(in srgb,var(--app-teal) 12%,transparent)}
+.app-main{width:min(100%,1640px);padding-top:clamp(18px,2.7vw,40px)}
+.app-topbar{border:1px solid rgba(255,255,255,.12);border-radius:25px;background:linear-gradient(112deg,#10192e 0%,#1a2a4a 44%,#30367d 75%,#176f77 125%);box-shadow:0 22px 50px rgba(21,31,74,.22),inset 0 1px rgba(255,255,255,.2);}
+.app-topbar:before{top:-175px;right:12%;width:460px;height:350px;background:radial-gradient(circle,rgba(165,173,255,.32) 0%,rgba(105,112,245,.12) 38%,transparent 71%);animation:ambientFloat 12s ease-in-out infinite alternate}
+.app-topbar:after{right:-78px;bottom:-180px;background:radial-gradient(circle,rgba(63,234,208,.19) 0%,rgba(63,234,208,.05) 40%,transparent 70%);animation:ambientFloat 10s ease-in-out infinite alternate-reverse}
+.page-heading:before{color:#b9e7ff;letter-spacing:.21em}.page-heading h1{letter-spacing:-.055em;text-shadow:0 2px 22px rgba(0,0,0,.16)}.page-heading p{color:rgba(244,248,255,.78)}
+.theme-toggle{background:rgba(255,255,255,.11);border-color:rgba(255,255,255,.23);backdrop-filter:blur(8px)}.theme-toggle:hover{transform:translateY(-2px)}
+.page-view.active{animation:pageIn3D .44s cubic-bezier(.2,.8,.2,1) both}
+.page-intro{margin-bottom:18px}.page-intro p{color:var(--app-muted)}
+.panel,.metric,.level-card,.hlc-card,.bep-metric,.fixed-visual-row,.formula-chip,.info-field,.source-box,.notice,.calc-note,.bep-calc-note{position:relative;isolation:isolate;border-color:var(--app-line);box-shadow:var(--app-shadow),inset 0 1px var(--v4-rim);transform-style:preserve-3d;transition:transform .26s cubic-bezier(.2,.8,.2,1),box-shadow .26s ease,border-color .2s ease,background-color .2s ease}
+.panel{background:linear-gradient(145deg,var(--surface) 0%,color-mix(in srgb,var(--surface-2) 36%,var(--surface)) 100%);border-radius:21px;box-shadow:0 11px 32px rgba(25,44,88,.065),inset 0 1px var(--v4-rim),inset 0 -1px rgba(106,127,171,.04)}
+.panel:before{content:"";position:absolute;z-index:-1;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(128deg,rgba(255,255,255,.23),transparent 30%);opacity:.65}
+.panel:hover{border-color:color-mix(in srgb,var(--app-accent) 35%,var(--app-line));box-shadow:var(--app-shadow-raised),inset 0 1px var(--v4-rim);transform:translateY(-2px)}
+.panel .panel{background:linear-gradient(145deg,var(--surface-2),var(--surface));border-radius:16px;box-shadow:inset 0 1px var(--v4-rim),0 6px 18px rgba(25,44,88,.035)}
+.sectionhead h2,h2,h3{letter-spacing:-.035em}
+.eyebrow{color:var(--app-accent-strong);letter-spacing:.14em;font-size:9px}
+.step-chip,.pill,.table-count,.atm-badge{box-shadow:inset 0 1px var(--v4-rim),0 3px 8px rgba(20,36,72,.035)}
+input,select,textarea{background:linear-gradient(180deg,var(--surface),var(--surface-2));border-color:var(--app-line);border-radius:12px;box-shadow:inset 0 1px 2px rgba(16,32,65,.025);transition:transform .2s,border-color .2s,box-shadow .2s,background .2s}
+input:hover,select:hover,textarea:hover{border-color:color-mix(in srgb,var(--app-accent) 35%,var(--app-line))}
+input:focus,select:focus,textarea:focus{transform:translateY(-1px);box-shadow:0 0 0 3px var(--focus-ring),0 7px 18px var(--v4-accent-glow)}
+button{border-radius:12px;background:linear-gradient(135deg,#6669f2,#5350d4 58%,#367dba);border:1px solid color-mix(in srgb,var(--app-accent) 76%,#ffffff);box-shadow:0 5px 0 color-mix(in srgb,var(--app-accent-strong) 76%,#252c60),0 9px 20px rgba(68,77,199,.18),inset 0 1px rgba(255,255,255,.28);transition:transform .2s cubic-bezier(.2,.8,.2,1),box-shadow .2s,filter .2s}
+button:hover{filter:brightness(1.05);transform:translateY(-2px);box-shadow:0 7px 0 color-mix(in srgb,var(--app-accent-strong) 76%,#252c60),0 13px 24px rgba(68,77,199,.22),inset 0 1px rgba(255,255,255,.31)}
+button:active{transform:translateY(2px);box-shadow:0 2px 0 color-mix(in srgb,var(--app-accent-strong) 76%,#252c60),0 4px 9px rgba(68,77,199,.13)}
+button.secondary{background:linear-gradient(180deg,var(--surface),var(--surface-2));border-color:var(--app-line);color:var(--app-text);box-shadow:0 3px 0 color-mix(in srgb,var(--app-line) 90%,#8a9ab7),0 6px 12px rgba(20,36,72,.045),inset 0 1px var(--v4-rim)}
+button.secondary:hover{background:linear-gradient(180deg,var(--surface),var(--app-accent-soft));border-color:color-mix(in srgb,var(--app-accent) 30%,var(--app-line));box-shadow:0 5px 0 color-mix(in srgb,var(--app-line) 75%,var(--app-accent)),0 10px 18px rgba(20,36,72,.08),inset 0 1px var(--v4-rim)}
+.actions{gap:10px}.actions button{min-height:43px}
+.cards,.level-grid,.hlc-grid,.bep-summary,.fixed-visual-bars{perspective:1200px}
+.metric{background:linear-gradient(145deg,var(--surface) 0%,var(--surface-2) 100%);border-radius:17px;padding:17px;border:1px solid color-mix(in srgb,var(--app-line) 84%,var(--app-accent));box-shadow:0 7px 0 color-mix(in srgb,var(--app-line) 43%,transparent),0 12px 25px rgba(25,44,88,.065),inset 0 1px var(--v4-rim);animation:resultRise .62s cubic-bezier(.18,.8,.25,1) both;animation-delay:calc(min(var(--row-order,0),9)*32ms)}
+.metric:nth-child(4n+1){--metric-accent:var(--app-accent)}.metric:nth-child(4n+2){--metric-accent:var(--app-teal)}.metric:nth-child(4n+3){--metric-accent:var(--app-violet)}.metric:nth-child(4n+4){--metric-accent:var(--app-amber)}
+.metric:before{content:"";position:absolute;left:14px;right:14px;top:0;height:3px;border-radius:0 0 6px 6px;background:linear-gradient(90deg,var(--metric-accent,var(--app-accent)),color-mix(in srgb,var(--metric-accent,var(--app-accent)) 25%,transparent));box-shadow:0 2px 9px color-mix(in srgb,var(--metric-accent,var(--app-accent)) 22%,transparent)}
+.metric:hover,.bep-metric:hover,.hlc-card:hover,.level-card:hover,.fixed-visual-row:hover{transform:translateY(-4px) rotateX(2deg) rotateY(-1deg);box-shadow:0 8px 0 color-mix(in srgb,var(--app-line) 48%,transparent),0 20px 34px rgba(25,44,88,.13),inset 0 1px var(--v4-rim);border-color:color-mix(in srgb,var(--app-accent) 34%,var(--app-line))}
+.metric strong{letter-spacing:-.045em;color:var(--app-text)}
+.level-card{border-radius:18px!important;box-shadow:0 6px 0 color-mix(in srgb,var(--app-line) 56%,transparent),0 13px 28px rgba(25,44,88,.08),inset 0 1px var(--v4-rim)!important;animation:resultRise .58s cubic-bezier(.18,.8,.25,1) both;}
+.level-card.s1,.level-card.s2{background:linear-gradient(145deg,color-mix(in srgb,var(--app-green-soft) 78%,var(--surface)),var(--surface))!important;border-color:color-mix(in srgb,#16834a 28%,var(--app-line))!important}
+.level-card.r1,.level-card.r2{background:linear-gradient(145deg,color-mix(in srgb,var(--app-red-soft) 78%,var(--surface)),var(--surface))!important;border-color:color-mix(in srgb,#d83a4e 28%,var(--app-line))!important}
+.level-card.s1 .level-value,.level-card.s2 .level-value{color:var(--app-green,#16834a)!important}
+.level-card.r1 .level-value,.level-card.r2 .level-value{color:var(--app-red,#d83a4e)!important}
+.level-card .level-value{text-shadow:0 2px 0 var(--v4-rim);letter-spacing:-.05em}
+.info-field{border-radius:15px;background:linear-gradient(115deg,var(--surface-2),color-mix(in srgb,var(--app-accent-soft) 42%,var(--surface)))!important;box-shadow:inset 0 1px var(--v4-rim),0 5px 14px rgba(22,39,82,.045)!important}
+.hlc-card{border-radius:19px!important;padding:18px;box-shadow:0 7px 0 color-mix(in srgb,var(--app-line) 55%,transparent),0 14px 28px rgba(25,44,88,.08),inset 0 1px var(--v4-rim)!important;animation:resultRise .56s ease both}
+.hlc-card.call{background:linear-gradient(145deg,color-mix(in srgb,var(--app-teal-soft) 80%,var(--surface)),var(--surface))!important}.hlc-card.put{background:linear-gradient(145deg,color-mix(in srgb,var(--app-violet-soft) 80%,var(--surface)),var(--surface))!important}
+.ohlc-cell{border-radius:12px;background:linear-gradient(145deg,var(--surface),var(--surface-2));box-shadow:inset 0 1px var(--v4-rim),0 3px 8px rgba(22,39,82,.04);transition:transform .18s,box-shadow .18s}
+.ohlc-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(22,39,82,.09),inset 0 1px var(--v4-rim)}
+.bep-metric{border-radius:15px;background:linear-gradient(150deg,var(--surface),var(--surface-2));box-shadow:0 4px 0 color-mix(in srgb,var(--app-line) 52%,transparent),0 9px 19px rgba(22,39,82,.06),inset 0 1px var(--v4-rim);animation:resultRise .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--metric-order,0)*60ms)}
+.bep-metric:nth-child(1){--bep-accent:var(--app-accent)}.bep-metric:nth-child(2){--bep-accent:var(--app-teal)}.bep-metric:nth-child(3){--bep-accent:var(--app-violet)}.bep-metric:nth-child(4){--bep-accent:var(--app-amber)}.bep-metric:nth-child(5){--bep-accent:var(--app-green)}
+.bep-metric:before{content:"";position:absolute;top:0;left:12px;right:12px;height:3px;border-radius:0 0 5px 5px;background:var(--bep-accent,var(--app-accent))}
+.bep-metric strong{font-size:clamp(18px,1.8vw,23px);letter-spacing:-.045em}
+.bep-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:0 0 17px;padding:13px 15px;border:1px solid color-mix(in srgb,var(--app-accent) 22%,var(--app-line));border-radius:16px;background:linear-gradient(110deg,color-mix(in srgb,var(--app-accent-soft) 66%,var(--surface)),color-mix(in srgb,var(--app-teal-soft) 36%,var(--surface)));box-shadow:inset 0 1px var(--v4-rim),0 6px 18px rgba(28,45,89,.045)}
+.bep-selection-status{display:flex;align-items:center;gap:11px;min-width:0}.bep-selection-mark{display:grid;place-items:center;width:37px;height:37px;flex:none;border-radius:12px;background:linear-gradient(145deg,var(--app-accent),var(--app-teal));color:white;font-size:20px;box-shadow:0 4px 0 color-mix(in srgb,var(--app-accent-strong) 42%,transparent),0 8px 15px var(--v4-accent-glow)}
+.bep-selection-status strong,.bep-selection-status small{display:block}.bep-selection-status strong{font-size:12px}.bep-selection-status small{margin-top:3px;color:var(--app-muted);font-size:10px;line-height:1.45}.bep-toolbar-actions{display:flex;gap:9px;flex-wrap:wrap}.bep-toolbar-actions button{min-height:39px}.bep-pick-button{background:linear-gradient(120deg,#5c60e9,#6558d7 60%,#197f94);box-shadow:0 4px 0 #3b459e,0 9px 18px rgba(83,91,220,.2),inset 0 1px rgba(255,255,255,.3)}
+.bep-strike-dialog{width:min(690px,calc(100vw - 26px));max-width:690px;max-height:min(86vh,850px);padding:0;border:1px solid color-mix(in srgb,var(--app-accent) 30%,var(--app-line));border-radius:24px;background:var(--surface);color:var(--app-text);box-shadow:0 35px 110px rgba(5,12,31,.38),0 0 0 1px rgba(255,255,255,.15),inset 0 1px var(--v4-rim);overflow:hidden;transform-origin:center;animation:dialogEnter .28s cubic-bezier(.18,.8,.25,1) both}
+.bep-strike-dialog::backdrop{background:rgba(7,13,29,.64);backdrop-filter:blur(7px)}.bep-strike-dialog[open]{display:block}
+.bep-dialog-shell{display:flex;flex-direction:column;max-height:min(86vh,850px);background:radial-gradient(circle at 100% 0%,var(--v4-accent-glow),transparent 36%),var(--surface)}
+.bep-dialog-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:23px 24px 18px;border-bottom:1px solid var(--app-line);background:linear-gradient(110deg,color-mix(in srgb,var(--app-accent-soft) 55%,var(--surface)),var(--surface))}
+.bep-dialog-head .eyebrow{margin-bottom:6px}.bep-dialog-head h2{margin:0;font-size:clamp(18px,2.4vw,24px);letter-spacing:-.045em}.bep-dialog-head p{max-width:510px;margin:7px 0 0;color:var(--app-muted);font-size:12px;line-height:1.55}
+.dialog-close{width:37px;min-width:37px;height:37px;min-height:37px;padding:0;border:1px solid var(--app-line);border-radius:12px;background:var(--surface);color:var(--app-muted);font-size:22px;line-height:1;box-shadow:0 3px 0 var(--app-line);}
+.bep-dialog-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:15px 24px 12px}.bep-search-wrap{display:flex;align-items:center;gap:9px;flex:1;min-width:190px;margin:0;padding:0 12px;border:1px solid var(--app-line);border-radius:12px;background:var(--surface-2);color:var(--app-muted)}.bep-search-wrap span{font-size:19px}.bep-search-wrap input{min-height:42px;padding-left:0;border:0;background:transparent;box-shadow:none}.bep-dialog-tools button{min-height:40px;padding:8px 11px}
+.bep-strike-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;padding:8px 24px 18px;overflow:auto;overscroll-behavior:contain;min-height:130px;max-height:min(48vh,460px);perspective:900px}
+.bep-strike-option{display:flex;align-items:center;gap:9px;min-width:0;margin:0;padding:10px 11px;border:1px solid var(--app-line);border-radius:12px;background:linear-gradient(145deg,var(--surface),var(--surface-2));cursor:pointer;box-shadow:0 3px 0 color-mix(in srgb,var(--app-line) 65%,transparent),inset 0 1px var(--v4-rim);transition:transform .18s,box-shadow .18s,border-color .18s,background .18s;animation:optionReveal .28s ease both}
+.bep-strike-option:hover{transform:translateY(-2px) rotateX(1.5deg);border-color:color-mix(in srgb,var(--app-accent) 40%,var(--app-line));box-shadow:0 5px 0 color-mix(in srgb,var(--app-accent) 18%,var(--app-line)),0 8px 16px rgba(23,40,84,.08)}
+.bep-strike-option:has(input:checked){border-color:color-mix(in srgb,var(--app-accent) 55%,var(--app-line));background:linear-gradient(140deg,var(--app-accent-soft),color-mix(in srgb,var(--app-teal-soft) 28%,var(--surface)));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--app-accent) 14%,transparent),0 4px 0 color-mix(in srgb,var(--app-accent) 20%,var(--app-line))}
+.bep-strike-option input{appearance:none;display:grid;place-content:center;min-width:17px;width:17px;height:17px;min-height:17px;margin:0;padding:0;border-radius:5px;border:1px solid var(--app-subtle);background:var(--surface);box-shadow:none;flex:none}
+.bep-strike-option input:before{content:"✓";color:white;font-size:11px;font-weight:900;transform:scale(0);transition:transform .12s}.bep-strike-option input:checked{border-color:var(--app-accent);background:linear-gradient(140deg,var(--app-accent),var(--app-teal))}.bep-strike-option input:checked:before{transform:scale(1)}
+.strike-option-number{font-size:12px;font-weight:850;font-variant-numeric:tabular-nums;white-space:nowrap}.strike-option-tag{margin-left:auto;min-width:0;color:var(--app-muted);font-size:8px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;text-align:right}.bep-strike-option:has(input:checked) .strike-option-tag{color:var(--app-accent-strong)}
+.bep-picker-empty{grid-column:1/-1;padding:30px 15px;border:1px dashed var(--app-line);border-radius:14px;color:var(--app-muted);text-align:center;font-size:12px}
+.bep-dialog-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:15px 24px;border-top:1px solid var(--app-line);background:var(--surface-2)}.bep-dialog-foot>span{color:var(--app-muted);font-size:11px;font-weight:700}.bep-dialog-foot>div{display:flex;gap:9px}
+#bepTable,#resultTable,#srStatsTable,#srEventsTable,#srNseLevelsTable,#fixedSummaryTable,#fixedEventsTable{border-collapse:separate;border-spacing:0 5px}
+#bepTable thead th,#resultTable thead th,#srStatsTable thead th,#srEventsTable thead th,#srNseLevelsTable thead th,#fixedSummaryTable thead th,#fixedEventsTable thead th{background:linear-gradient(180deg,var(--surface-3),color-mix(in srgb,var(--surface-3) 72%,var(--surface)));border-bottom:1px solid var(--app-line);box-shadow:inset 0 1px var(--v4-rim),inset 0 -2px color-mix(in srgb,var(--app-accent) 12%,transparent);color:var(--app-text)}
+#bepTable tbody tr,#resultTable tbody tr,#srStatsTable tbody tr,#srEventsTable tbody tr,#srNseLevelsTable tbody tr,#fixedSummaryTable tbody tr,#fixedEventsTable tbody tr{transition:transform .16s ease,filter .16s ease;animation:rowReveal .36s ease both;animation-delay:calc(min(var(--row-order,0),14)*18ms)}
+#bepTable tbody tr:hover,#resultTable tbody tr:hover,#srStatsTable tbody tr:hover,#srEventsTable tbody tr:hover,#srNseLevelsTable tbody tr:hover,#fixedSummaryTable tbody tr:hover,#fixedEventsTable tbody tr:hover{transform:translateY(-2px);filter:drop-shadow(0 5px 7px rgba(18,32,68,.12))}
+#bepTable tbody td,#resultTable tbody td,#srStatsTable tbody td,#srEventsTable tbody td,#srNseLevelsTable tbody td,#fixedSummaryTable tbody td,#fixedEventsTable tbody td{background:var(--surface);border-top:1px solid color-mix(in srgb,var(--app-line) 72%,transparent);border-bottom:1px solid color-mix(in srgb,var(--app-line) 72%,transparent);padding-top:11px;padding-bottom:11px}
+#bepTable tbody tr:nth-child(even) td,#resultTable tbody tr:nth-child(even) td,#srStatsTable tbody tr:nth-child(even) td,#srEventsTable tbody tr:nth-child(even) td,#srNseLevelsTable tbody tr:nth-child(even) td,#fixedSummaryTable tbody tr:nth-child(even) td,#fixedEventsTable tbody tr:nth-child(even) td{background:var(--surface-2)}
+#bepTable tbody tr.hlc-bep-row td,#resultTable tbody tr.hlc-row td{background:linear-gradient(105deg,var(--app-amber-soft),color-mix(in srgb,var(--app-amber-soft) 48%,var(--surface)))!important;border-top-color:color-mix(in srgb,var(--app-amber) 22%,var(--app-line));border-bottom-color:color-mix(in srgb,var(--app-amber) 22%,var(--app-line))}
+#bepTable tbody td:first-child,#resultTable tbody td:first-child,#srStatsTable tbody td:first-child,#srEventsTable tbody td:first-child,#srNseLevelsTable tbody td:first-child,#fixedSummaryTable tbody td:first-child,#fixedEventsTable tbody td:first-child{border-left:1px solid color-mix(in srgb,var(--app-line) 75%,transparent);border-radius:9px 0 0 9px}
+#bepTable tbody td:last-child,#resultTable tbody td:last-child,#srStatsTable tbody td:last-child,#srEventsTable tbody td:last-child,#srNseLevelsTable tbody td:last-child,#fixedSummaryTable tbody td:last-child,#fixedEventsTable tbody td:last-child{border-right:1px solid color-mix(in srgb,var(--app-line) 75%,transparent);border-radius:0 9px 9px 0}
+.bep-value{font-weight:850;color:var(--app-accent-strong)}
+.tablewrap,.bep-table-wrap{border-color:var(--app-line);border-radius:16px;box-shadow:inset 0 1px var(--v4-rim),0 8px 22px rgba(22,39,82,.045)}
+.table-count{background:var(--app-accent-soft);color:var(--app-accent-strong);border-color:color-mix(in srgb,var(--app-accent) 18%,var(--app-line))}
+.sr-bar,.fixed-visual-track{height:10px;background:linear-gradient(180deg,var(--surface-3),var(--surface-2));box-shadow:inset 0 2px 3px rgba(18,32,68,.07);border:1px solid color-mix(in srgb,var(--app-line) 76%,transparent)}
+.sr-bar span,.fixed-visual-fill{position:relative;background:linear-gradient(90deg,var(--app-accent),var(--app-teal),var(--app-violet));background-size:180% 100%;box-shadow:0 0 12px var(--v4-accent-glow);animation:fillShine 3.4s ease-in-out infinite alternate}
+.fixed-visual-row{border-radius:15px;background:linear-gradient(145deg,var(--surface),var(--surface-2));box-shadow:0 5px 0 color-mix(in srgb,var(--app-line) 50%,transparent),0 10px 20px rgba(23,40,84,.055),inset 0 1px var(--v4-rim)}
+.fixed-visual-row.best{background:linear-gradient(145deg,color-mix(in srgb,var(--app-amber-soft) 73%,var(--surface)),var(--surface))}
+#niftySpotLevelsCanvas{box-shadow:0 8px 0 color-mix(in srgb,var(--app-line) 48%,transparent),0 14px 30px rgba(20,36,75,.12),inset 0 1px var(--v4-rim);transform:perspective(1300px) rotateX(.6deg);transform-origin:center bottom;transition:transform .25s,box-shadow .25s}
+#niftySpotLevelsCanvas:hover{transform:perspective(1300px) rotateX(0deg) translateY(-2px);box-shadow:0 11px 0 color-mix(in srgb,var(--app-line) 48%,transparent),0 20px 38px rgba(20,36,75,.16),inset 0 1px var(--v4-rim)}
+.chart-depth-frame{border-color:color-mix(in srgb,var(--app-accent) 18%,var(--app-line));background:linear-gradient(145deg,var(--surface),var(--surface-2));box-shadow:0 7px 0 color-mix(in srgb,var(--app-line) 48%,transparent),0 20px 34px rgba(22,39,82,.1),inset 0 1px var(--v4-rim)}
+.notice,.source-box,.status,.calc-note{border-radius:14px;background:linear-gradient(110deg,var(--surface),var(--surface-2));box-shadow:inset 0 1px var(--v4-rim),0 7px 17px rgba(22,39,82,.045)}
+.page-view[data-page="session"] .panel{--page-accent:var(--app-accent)}
+.page-view[data-page="overview"] .panel{--page-accent:var(--app-teal)}
+.page-view[data-page="contracts"] .panel{--page-accent:#467dde}
+.page-view[data-page="analytics"] .panel{--page-accent:var(--app-violet)}
+.page-view[data-page="historical-sr"] .panel{--page-accent:var(--app-rose,var(--app-red))}
+.page-view[data-page="guide"] .panel{--page-accent:var(--app-green)}
+.page-view>.panel>.sectionhead:before,.page-view>section.panel>.sectionhead:before{content:"";display:block;position:absolute;left:clamp(17px,1.8vw,25px);top:0;width:56px;height:3px;border-radius:0 0 5px 5px;background:var(--page-accent,var(--app-accent));box-shadow:0 2px 11px color-mix(in srgb,var(--page-accent,var(--app-accent)) 24%,transparent)}
+.page-view[data-page="analytics"] .bep-panel{--page-accent:var(--app-violet)}
+html[data-theme="dark"] .app-topbar{box-shadow:0 24px 55px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.13)}
+html[data-theme="dark"] .panel{box-shadow:0 13px 35px rgba(0,0,0,.2),inset 0 1px var(--v4-rim)}
+html[data-theme="dark"] .metric,html[data-theme="dark"] .bep-metric,html[data-theme="dark"] .hlc-card,html[data-theme="dark"] .level-card{box-shadow:0 6px 0 rgba(0,0,0,.15),0 14px 28px rgba(0,0,0,.22),inset 0 1px var(--v4-rim)}
+html[data-theme="dark"] .bep-strike-dialog{box-shadow:0 35px 110px rgba(0,0,0,.65),inset 0 1px var(--v4-rim)}
+html[data-theme="dark"] .bep-strike-option{box-shadow:0 3px 0 rgba(0,0,0,.18),inset 0 1px var(--v4-rim)}
+html[data-theme="dark"] .nav-item:hover{box-shadow:0 5px 14px rgba(0,0,0,.2)}
+@keyframes pageIn3D{from{opacity:0;transform:perspective(1200px) translateY(13px) rotateX(1.5deg)}to{opacity:1;transform:perspective(1200px) translateY(0) rotateX(0)}}
+@keyframes resultRise{0%{opacity:0;transform:perspective(1000px) translateY(16px) rotateX(5deg) scale(.98)}100%{opacity:1;transform:perspective(1000px) translateY(0) rotateX(0) scale(1)}}
+@keyframes rowReveal{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes optionReveal{from{opacity:0;transform:perspective(800px) translateY(5px) rotateX(3deg)}to{opacity:1;transform:perspective(800px) translateY(0) rotateX(0)}}
+@keyframes dialogEnter{from{opacity:0;transform:perspective(1300px) translateY(16px) rotateX(3deg) scale(.98)}to{opacity:1;transform:perspective(1300px) translateY(0) rotateX(0) scale(1)}}
+@keyframes fillShine{0%{background-position:0% 50%;filter:saturate(.92)}100%{background-position:100% 50%;filter:saturate(1.18)}}
+@keyframes ambientFloat{from{transform:translate3d(-8px,5px,0) scale(.96)}to{transform:translate3d(15px,-8px,0) scale(1.06)}}
+@media(max-width:850px){.nav-item{padding:7px 10px}.nav-item.active:before{display:none}.app-topbar{border-radius:21px}}
+@media(max-width:700px){.bep-dialog-head{padding:19px 17px 14px}.bep-dialog-tools{padding:12px 17px}.bep-strike-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:8px 17px 15px}.bep-dialog-foot{padding:13px 17px}.bep-strike-option{padding:10px 8px}.strike-option-tag{font-size:7px}.bep-toolbar{align-items:stretch}.bep-toolbar-actions{width:100%}.bep-toolbar-actions button{flex:1}.bep-selection-status small{max-width:240px}.panel:hover{transform:translateY(-1px)}}
+@media(max-width:430px){.bep-dialog-tools .secondary{flex:1}.bep-search-wrap{flex-basis:100%}.bep-strike-list{gap:7px}.bep-strike-option{gap:6px}.strike-option-number{font-size:11px}.bep-dialog-foot{align-items:stretch}.bep-dialog-foot>span{width:100%}.bep-dialog-foot>div{width:100%}.bep-dialog-foot>div button{flex:1}.bep-dialog-head h2{font-size:18px}.bep-dialog-head p{font-size:11px}.app-topbar{background:linear-gradient(120deg,#10192e,#212e55 58%,#1c6b74)}.panel{border-radius:17px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important;transform:none!important}}
+
+/* V5: cinematic ribbon reveal inspired by the supplied brand-motion reference */
+.brand-intro{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;overflow:hidden;background:#11151e;color:#f7f8fc;opacity:1;visibility:visible;transition:opacity .72s ease,visibility .72s ease}
+.brand-intro.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
+.intro-ribbons{position:absolute;inset:-22%;overflow:hidden;background:linear-gradient(128deg,#eaf7b4 0%,#a9d9e8 20%,#7f9cff 36%,#ffb56b 54%,#fa6e66 68%,#d8f19c 83%,#9bd5f3 100%);filter:saturate(1.12)}
+.intro-ribbons:before,.intro-ribbons:after{content:"";position:absolute;inset:-20%;background:repeating-linear-gradient(122deg,transparent 0 9%,rgba(255,255,255,.3) 10%,transparent 14% 23%);mix-blend-mode:soft-light;animation:ribbonSweep 7s cubic-bezier(.45,0,.25,1) infinite alternate}
+.intro-ribbons:after{background:linear-gradient(116deg,transparent 20%,rgba(255,255,255,.52) 31%,rgba(112,136,255,.22) 39%,transparent 49%,rgba(255,255,255,.35) 58%,transparent 70%);filter:blur(9px);animation:ribbonSweepAlt 8s ease-in-out infinite alternate}
+.intro-ribbons i{position:absolute;display:block;width:24vw;height:150%;top:-25%;border-radius:50%;filter:blur(24px);opacity:.7;transform:rotate(34deg);animation:ribbonFloat 6s ease-in-out infinite alternate}
+.intro-ribbons i:nth-child(1){left:4%;background:linear-gradient(180deg,#b3eea4,#f7f8b5,#6fbbff);animation-delay:-1s}
+.intro-ribbons i:nth-child(2){left:25%;background:linear-gradient(180deg,#7a91ff,#f5d1a3,#ff6e64);animation-delay:-3s}
+.intro-ribbons i:nth-child(3){left:48%;background:linear-gradient(180deg,#f5b8a3,#9f9aff,#b5ef9a);animation-delay:-2s}
+.intro-ribbons i:nth-child(4){left:70%;background:linear-gradient(180deg,#91cfff,#ffd38e,#b7efad);animation-delay:-4s}
+.intro-ribbons i:nth-child(5){left:88%;background:linear-gradient(180deg,#ffd0a1,#ff8d79,#8ab8ff);animation-delay:-1.5s}
+.intro-card{position:relative;display:flex;align-items:center;gap:20px;padding:30px 38px;border:1px solid rgba(255,255,255,.42);border-radius:24px;background:rgba(17,21,30,.76);box-shadow:0 30px 90px rgba(18,25,40,.22),inset 0 1px rgba(255,255,255,.32);backdrop-filter:blur(18px);animation:logoReveal 1.1s cubic-bezier(.16,.8,.22,1) both}
+.intro-mark{position:relative;display:grid;grid-template-columns:repeat(2,12px);grid-template-rows:repeat(2,12px);gap:6px;transform:rotate(-8deg)}
+.intro-mark span{border-radius:4px;background:#b7ed84;box-shadow:0 0 18px rgba(183,237,132,.25);animation:markPulse 1.8s ease-in-out infinite alternate}
+.intro-mark span:nth-child(2){background:#91d8e9;animation-delay:.2s}.intro-mark span:nth-child(3){background:#a8a2ff;animation-delay:.4s}.intro-mark span:nth-child(4){background:#ffbd83;animation-delay:.6s}
+.intro-mark b{position:absolute;inset:-9px;border:1px solid rgba(255,255,255,.35);border-radius:12px;transform:rotate(45deg);animation:markOrbit 8s linear infinite}
+.intro-wordmark strong{display:block;font-size:clamp(27px,4vw,44px);font-weight:850;letter-spacing:-.07em;line-height:1}.intro-wordmark em{font-style:normal;color:#c4f29a}.intro-wordmark small{display:block;margin-top:9px;font-size:9px;letter-spacing:.22em;font-weight:800;color:rgba(255,255,255,.72)}
+#skipIntro{position:absolute;right:24px;bottom:22px;padding:10px 14px;border:1px solid rgba(255,255,255,.5);border-radius:999px;background:rgba(20,25,35,.25);color:white;font-size:11px;font-weight:750;cursor:pointer;backdrop-filter:blur(8px)}
+#skipIntro span{margin-left:8px}
+@keyframes ribbonSweep{from{transform:translate3d(-4%,2%,0) rotate(-2deg) scale(1)}to{transform:translate3d(5%,-3%,0) rotate(5deg) scale(1.08)}}
+@keyframes ribbonSweepAlt{from{transform:translateX(-7%) rotate(-4deg)}to{transform:translateX(7%) rotate(4deg)}}
+@keyframes ribbonFloat{from{translate:0 -2%;rotate:-5deg}to{translate:2% 3%;rotate:6deg}}
+@keyframes logoReveal{0%{opacity:0;transform:perspective(1000px) translateY(28px) rotateX(12deg) scale(.92);filter:blur(8px)}65%{opacity:1;filter:blur(0)}100%{opacity:1;transform:perspective(1000px) translateY(0) rotateX(0) scale(1)}}
+@keyframes markPulse{from{transform:scale(.86);filter:brightness(.9)}to{transform:scale(1.08);filter:brightness(1.2)}}
+@keyframes markOrbit{to{transform:rotate(405deg)}}
+/* Data session layout: deliberate 3-column groups instead of stretched, unbalanced fields */
+#fetchForm>.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 18px;align-items:start;max-width:100%}
+#fetchForm>.grid>div{min-width:0}
+#fetchForm>.grid>div:nth-of-type(1) .info-field{min-height:76px}
+#fetchForm>.grid>div:nth-of-type(2),#fetchForm>.grid>div:nth-of-type(3),#fetchForm>.grid>div:nth-of-type(4){align-self:start}
+#fetchForm>.grid .wide{grid-column:1/-1}
+#fetchForm>.grid>div{padding:0 0 2px}
+#fetchForm>.grid label{display:block;margin-bottom:7px;font-size:11px;font-weight:780;letter-spacing:.01em}
+#fetchForm>.grid input:not([type=hidden]),#fetchForm>.grid select{width:100%;min-height:43px}
+#fetchForm .status{margin-top:14px}
+#fetchForm .actions button{min-width:125px}
+#fetchForm>.grid .wide .info-field{background:linear-gradient(110deg,var(--app-accent-soft),var(--app-teal-soft));border-color:color-mix(in srgb,var(--app-accent) 18%,var(--app-line))}
+#fetchForm .actions{position:static;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0;margin-top:22px;border:0;border-radius:0;background:transparent;box-shadow:none;backdrop-filter:none}
+/* Clear top-level manual workflow tabs and consistent single-view transitions */
+.sidebar{position:sticky;top:0;display:flex;flex-wrap:wrap;gap:10px 24px;padding:12px clamp(14px,3vw,40px)}
+.sidebar>div:nth-child(2){flex:1 1 650px}
+.side-nav{justify-content:flex-start;gap:7px;overflow-x:auto;padding:3px 2px}
+.nav-item{min-height:42px;padding:8px 13px;border:1px solid transparent;border-radius:12px;border-bottom:1px solid transparent}
+.nav-item:hover{background:var(--surface-2);border-color:var(--app-line);transform:translateY(-1px)}
+.nav-item.active{background:linear-gradient(135deg,var(--app-accent-soft),var(--app-teal-soft));border-color:color-mix(in srgb,var(--app-accent) 26%,var(--app-line));border-bottom-color:color-mix(in srgb,var(--app-accent) 26%,var(--app-line));box-shadow:0 4px 0 color-mix(in srgb,var(--app-accent) 13%,transparent),inset 0 1px rgba(255,255,255,.65)}
+.page-view.active{animation:pageIn3D .34s cubic-bezier(.2,.8,.2,1)}
+.app-topbar{min-height:104px;border-radius:22px;background:linear-gradient(112deg,#151b2a 0%,#26314c 47%,#176e75 100%)}
+.app-topbar:before{background:radial-gradient(circle,rgba(190,238,148,.25),transparent 68%);animation:ambientFloat 7s ease-in-out infinite alternate}
+#tablePanel .table-tools{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex-wrap:wrap}
+#tablePanel #search{max-width:240px}
+@media(max-width:900px){#fetchForm>.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:15px} .sidebar>div:nth-child(2){flex-basis:100%}}
+@media(max-width:600px){.brand-intro .intro-card{gap:14px;padding:23px 25px}.intro-mark{transform:scale(.8)}.intro-wordmark strong{font-size:28px}.intro-wordmark small{font-size:7px;letter-spacing:.14em}#fetchForm>.grid{grid-template-columns:minmax(0,1fr);gap:13px}#fetchForm>.grid .wide{grid-column:1}.sidebar{gap:7px;padding:8px 10px}.side-brand{min-width:0}.side-nav{gap:5px}.nav-item{min-height:39px;padding:7px 10px}.nav-label{font-size:10px}.app-topbar{min-height:90px;padding:18px}.app-main{padding-top:14px}}
+@media(prefers-reduced-motion:reduce){.brand-intro{display:none!important}.intro-ribbons i,.intro-ribbons:before,.intro-ribbons:after,.intro-mark span,.intro-mark b{animation:none!important}}
+
+
+/* Standalone legacy workspace intro; parent React shell marks it as seen. */
+.brand-intro{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;overflow:hidden;background:#11151e;color:#f7f8fc;opacity:1;visibility:visible;transition:opacity .7s ease,visibility .7s ease}
+.brand-intro.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
+.intro-ribbons{position:absolute;inset:-22%;background:linear-gradient(128deg,#eaf7b4 0%,#a9d9e8 20%,#7f9cff 36%,#ffb56b 54%,#fa6e66 68%,#d8f19c 83%,#9bd5f3 100%);filter:saturate(1.12);overflow:hidden}
+.intro-ribbons:before,.intro-ribbons:after{content:"";position:absolute;inset:-20%;background:repeating-linear-gradient(122deg,transparent 0 9%,rgba(255,255,255,.3) 10%,transparent 14% 23%);mix-blend-mode:soft-light;animation:ribbonSweep 7s ease-in-out infinite alternate}
+.intro-ribbons:after{background:linear-gradient(116deg,transparent 20%,rgba(255,255,255,.52) 31%,rgba(112,136,255,.22) 39%,transparent 49%,rgba(255,255,255,.35) 58%,transparent 70%);filter:blur(9px)}
+.intro-ribbons i{position:absolute;display:block;width:24vw;height:150%;top:-25%;border-radius:50%;filter:blur(24px);opacity:.7;transform:rotate(34deg);animation:ribbonFloat 6s ease-in-out infinite alternate}
+.intro-ribbons i:nth-child(1){left:4%;background:linear-gradient(180deg,#b3eea4,#f7f8b5,#6fbbff)}.intro-ribbons i:nth-child(2){left:25%;background:linear-gradient(180deg,#7a91ff,#f5d1a3,#ff6e64);animation-delay:-2s}.intro-ribbons i:nth-child(3){left:48%;background:linear-gradient(180deg,#f5b8a3,#9f9aff,#b5ef9a);animation-delay:-3s}.intro-ribbons i:nth-child(4){left:70%;background:linear-gradient(180deg,#91cfff,#ffd38e,#b7efad);animation-delay:-1s}.intro-ribbons i:nth-child(5){left:88%;background:linear-gradient(180deg,#ffd0a1,#ff8d79,#8ab8ff);animation-delay:-4s}
+.intro-card{position:relative;display:flex;align-items:center;gap:20px;padding:30px 38px;border:1px solid rgba(255,255,255,.42);border-radius:24px;background:rgba(17,21,30,.76);box-shadow:0 30px 90px rgba(18,25,40,.22),inset 0 1px rgba(255,255,255,.32);backdrop-filter:blur(18px);animation:logoReveal 1.1s cubic-bezier(.16,.8,.22,1) both}
+.intro-mark{position:relative;display:grid;grid-template-columns:repeat(2,12px);grid-template-rows:repeat(2,12px);gap:6px}.intro-mark span{border-radius:4px;background:#b7ed84;animation:markPulse 1.8s ease-in-out infinite alternate}.intro-mark span:nth-child(2){background:#91d8e9}.intro-mark span:nth-child(3){background:#a8a2ff}.intro-mark span:nth-child(4){background:#ffbd83}.intro-mark b{position:absolute;inset:-9px;border:1px solid rgba(255,255,255,.35);border-radius:12px;animation:markOrbit 8s linear infinite}
+.intro-wordmark strong{display:block;font-size:clamp(27px,4vw,44px);font-weight:850;letter-spacing:-.07em;line-height:1}.intro-wordmark em{font-style:normal;color:#c4f29a}.intro-wordmark small{display:block;margin-top:9px;font-size:9px;letter-spacing:.22em;font-weight:800;color:rgba(255,255,255,.72)}
+#skipIntro{position:absolute;right:24px;bottom:22px;padding:10px 14px;border:1px solid rgba(255,255,255,.5);border-radius:999px;background:rgba(20,25,35,.25);color:white;font-size:11px;font-weight:750;cursor:pointer}
+@keyframes ribbonSweep{from{transform:translate3d(-4%,2%,0) rotate(-2deg)}to{transform:translate3d(5%,-3%,0) rotate(5deg)}}@keyframes ribbonFloat{from{translate:0 -2%;rotate:-5deg}to{translate:2% 3%;rotate:6deg}}@keyframes logoReveal{0%{opacity:0;transform:perspective(1000px) translateY(28px) rotateX(12deg) scale(.92);filter:blur(8px)}65%{opacity:1;filter:blur(0)}100%{opacity:1;transform:perspective(1000px) translateY(0) rotateX(0) scale(1)}}@keyframes markPulse{from{transform:scale(.86)}to{transform:scale(1.08);filter:brightness(1.2)}}@keyframes markOrbit{to{transform:rotate(405deg)}}
+@media(max-width:600px){.intro-card{gap:14px;padding:23px 25px}.intro-wordmark strong{font-size:28px}.intro-wordmark small{font-size:7px;letter-spacing:.14em}}
+@media(prefers-reduced-motion:reduce){.brand-intro{display:none!important}}
+
+</style>
+
+<style id="fixed-events-scroll-and-range-chart-v11">
+/* Fixed-height event log: keep the page layout stable while every matching event stays inside the scrollable table. */
+#fixedEventsTableWrap{height:430px;max-height:430px;min-height:430px;overflow:auto;overscroll-behavior:contain;position:relative;scrollbar-gutter:stable;}
+#fixedEventsTable{min-width:1420px;width:100%;table-layout:fixed;}
+#fixedEventsTable thead th{position:sticky;top:0;z-index:5;}
+#fixedEventsTable th:nth-child(1){width:105px}#fixedEventsTable th:nth-child(2){width:95px}#fixedEventsTable th:nth-child(3){width:70px}#fixedEventsTable th:nth-child(4){width:105px}#fixedEventsTable th:nth-child(5){width:125px}#fixedEventsTable th:nth-child(6){width:115px}#fixedEventsTable th:nth-child(7),#fixedEventsTable th:nth-child(8),#fixedEventsTable th:nth-child(9),#fixedEventsTable th:nth-child(10){width:90px}#fixedEventsTable th:nth-child(11){width:165px}#fixedEventsTable th:nth-child(12){width:110px}#fixedEventsTable th:nth-child(13){width:320px}
+#fixedEventsTable td{white-space:normal;overflow-wrap:anywhere;}
+#fixedEventsTable td:nth-child(1),#fixedEventsTable td:nth-child(2),#fixedEventsTable td:nth-child(3),#fixedEventsTable td:nth-child(4),#fixedEventsTable td:nth-child(7),#fixedEventsTable td:nth-child(8),#fixedEventsTable td:nth-child(9),#fixedEventsTable td:nth-child(10),#fixedEventsTable td:nth-child(12){white-space:nowrap;font-variant-numeric:tabular-nums;}
+@media(max-width:700px){#fixedEventsTableWrap{height:390px;max-height:390px;min-height:390px;}#fixedEventsTable{min-width:1420px;}}
+</style>
+
+
+<style id="history-tab-table-only-layout-v12">
+/* History tab display-only change: keep Section C event table as the final visible result.
+   Existing HTML, calculations, event handlers, data retrieval and exports are preserved. */
+.page-view[data-page="historical-sr"] #fixedVisualPanel,
+.page-view[data-page="historical-sr"] #niftySpotLevelsChartPanel,
+.page-view[data-page="historical-sr"] #historicalSrAutoForm,
+.page-view[data-page="historical-sr"] #srNseLevelsPanel,
+.page-view[data-page="historical-sr"] #srHistoricalResults,
+.page-view[data-page="historical-sr"] > details {
+  display: none !important;
+}
+</style>
+
+<style id="workspace-spacing-and-toolbar-v13">
+/* Consistent spacing and alignment across the six workspace tabs. */
+.page-view {
+  width: 100%;
+  min-width: 0;
+}
+.page-intro {
+  align-items: flex-start;
+  gap: 10px 18px;
+  margin-bottom: 18px;
+}
+.page-intro > div { min-width: 0; }
+.page-intro p { max-width: 780px; }
+.page-view > .panel,
+.page-view > section.panel {
+  margin-bottom: 18px;
+}
+.panel { min-width: 0; }
+.sectionhead {
+  align-items: center;
+  gap: 12px 16px;
+  margin-bottom: 16px;
+}
+.sectionhead > div { min-width: 0; }
+.grid {
+  align-items: start;
+  column-gap: 16px;
+  row-gap: 16px;
+}
+.grid > div { min-width: 0; }
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.actions button,
+.table-tools button {
+  min-height: 40px;
+  white-space: nowrap;
+}
+.table-top {
+  align-items: center;
+  gap: 14px 18px;
+  margin-bottom: 16px;
+}
+.table-top > div { min-width: 0; }
+#tablePanel .table-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+#tablePanel .table-tools #search {
+  flex: 1 1 180px;
+  width: auto;
+  min-width: 150px;
+  max-width: 240px;
+}
+#tablePanel .table-export-actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  gap: 8px;
+  white-space: nowrap;
+}
+#tablePanel .table-export-actions button {
+  flex: 0 0 auto;
+  min-width: 96px;
+}
+.tablewrap { min-width: 0; }
+
+@media (max-width: 900px) {
+  .page-view > .panel,
+  .page-view > section.panel { margin-bottom: 15px; }
+  .sectionhead { align-items: flex-start; }
+  #tablePanel .table-top { align-items: flex-start; }
+  #tablePanel .table-tools {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+@media (max-width: 600px) {
+  .page-intro { margin-bottom: 14px; }
+  .sectionhead { gap: 9px 12px; margin-bottom: 13px; }
+  .grid { row-gap: 13px; }
+  .actions { gap: 8px; }
+  #tablePanel .table-tools {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 9px;
+  }
+  #tablePanel .table-tools #search {
+    min-width: 0;
+    width: 100%;
+    max-width: none;
+  }
+  #tablePanel .table-export-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    width: 100%;
+  }
+  #tablePanel .table-export-actions button {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+}
+@media (max-width: 360px) {
+  #tablePanel .table-export-actions { gap: 6px; }
+  #tablePanel .table-export-actions button {
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 10px;
+  }
+}
+</style>
+
+
+<style id="nifty-v13-layout-polish">
+/* NIFTY LAB v13 — consistent spacing and responsive control alignment.
+   Presentation-only CSS: no calculation, data, or event logic is changed. */
+.page-view { min-width: 0; }
+.page-view.active { display: block; }
+.page-intro { gap: 14px 18px; margin-bottom: 20px; }
+.page-view > .panel,
+.page-view > section.panel { min-width: 0; margin-bottom: 18px; }
+.panel { min-width: 0; }
+.panel .panel { margin: 16px 0; padding: 16px; }
+.sectionhead { align-items: center; gap: 12px 18px; margin-bottom: 16px; }
+.sectionhead > * { min-width: 0; }
+.sectionhead > .actions { margin-top: 0; }
+.grid { align-items: start; column-gap: 16px; row-gap: 16px; }
+.grid > div { min-width: 0; }
+label { margin-bottom: 8px; }
+input, select, textarea { max-width: 100%; }
+.actions { align-items: center; gap: 10px; margin-top: 18px; }
+.actions button, .table-tools button { min-height: 40px; }
+.cards, .level-grid, .hlc-grid, .bep-summary, .formula-row, .fixed-visual-bars { gap: 14px; }
+.tablewrap, .bep-table-wrap { min-width: 0; }
+.table-top { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; gap: 12px; margin-bottom: 16px; }
+.table-top > div { min-width: 0; }
+#tablePanel .table-tools {
+  display: grid;
+  grid-template-columns: max-content minmax(180px, 1fr) max-content;
+  align-items: center;
+  justify-content: stretch;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+}
+#tablePanel .table-tools .table-count { white-space: nowrap; }
+#tablePanel .table-tools #search {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  flex: initial;
+}
+#tablePanel .table-export-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  gap: 8px;
+  min-width: 0;
+  white-space: nowrap;
+}
+#tablePanel .table-export-actions button {
+  flex: 0 0 auto;
+  min-width: 96px;
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  .page-view > .panel,
+  .page-view > section.panel { margin-bottom: 16px; }
+  .sectionhead { align-items: flex-start; }
+  .table-top { align-items: start; }
+}
+@media (max-width: 600px) {
+  .page-intro { margin-bottom: 15px; }
+  .page-view > .panel,
+  .page-view > section.panel { margin-bottom: 13px; }
+  .panel { padding: 14px; }
+  .panel .panel { margin: 12px 0; padding: 12px; }
+  .sectionhead { gap: 9px 12px; margin-bottom: 13px; }
+  .grid { column-gap: 12px; row-gap: 13px; }
+  .actions { gap: 8px; margin-top: 14px; }
+  #tablePanel .table-tools {
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 9px;
+  }
+  #tablePanel .table-tools #search { min-width: 0; width: 100%; }
+  #tablePanel .table-export-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    width: 100%;
+    justify-content: flex-start;
+  }
+  #tablePanel .table-export-actions button {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+@media (max-width: 360px) {
+  #tablePanel .table-export-actions { gap: 6px; }
+  #tablePanel .table-export-actions button { padding-inline: 8px; font-size: 10px; }
+}
+</style>
+
+</head>
+<body>
+<div class="app-shell">
+<aside class="sidebar" aria-label="Main navigation">
+ <div class="side-brand"><div class="side-logo" role="img" aria-label="NIFTY LAB mark"><span></span><span></span><span></span><span></span></div><div><strong>NIFTY LAB</strong><small>Options research workspace</small></div></div>
+ <div><div class="nav-caption">Workspace</div><nav class="side-nav">
+  <button class="nav-item active" data-page-target="session" type="button"><span class="nav-icon">⚙</span><span class="nav-label">Data session</span></button>
+  <button class="nav-item" data-page-target="overview" type="button"><span class="nav-icon">⌂</span><span class="nav-label">Market Levels</span></button>
+  <button class="nav-item" data-page-target="contracts" type="button"><span class="nav-icon">▤</span><span class="nav-label">Contracts</span></button>
+  <button class="nav-item" data-page-target="analytics" type="button"><span class="nav-icon">∑</span><span class="nav-label">BEP analysis</span></button>
+  <button class="nav-item" data-page-target="historical-sr" type="button"><span class="nav-icon">◷</span><span class="nav-label">Historical S&amp;R</span></button>
+  <button class="nav-item" data-page-target="guide" type="button"><span class="nav-icon">ⓘ</span><span class="nav-label">Formula guide</span></button>
+ </nav></div>
+ <div class="sidebar-bottom">Historical options analysis<br>Data source and expiry are shown with each result.</div>
+</aside>
+<main class="app-main">
+<div class="app-topbar"><div class="page-heading"><h1 id="pageTitle">Data session</h1><p id="pageSubtitle">Historical session snapshot, ATM levels and source status</p></div><div class="topbar-actions"><button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">☾ Dark mode</button></div></div>
+<header class="top"><div><h1><span class="brandmark">IDX</span>NIFTY 50 Options Dashboard</h1><div class="sub">Historical NIFTY 50 options research</div></div><div class="pill">Exact historical session · No substituted contracts</div></header>
+<div class="notice" id="dataNotice">NIFTY 50 data engine · NSE archive/API with CSV/ZIP upload fallback. Exact date/expiry validation is always enforced.</div>
+<div class="page-view active" data-page="session"><div class="page-intro"><div><h2>Data session</h2><p>Choose the historical trading session and strike range.</p></div></div><section class="panel"><div class="sectionhead"><h2>Session & strike configuration</h2><span class="muted">Step 1 · Choose the market and contract</span></div>
+<form id="fetchForm" class="session-form">
+<div class="session-group"><div class="session-group-head"><span class="session-step">01</span><div><strong>Trading session</strong><small>Choose the historical market date and contract expiry.</small></div></div><div class="grid session-grid">
+<input type="hidden" name="symbol" id="indexSelect" value="NIFTY"><div><label>Index</label><div class="info-field"><div class="info-icon">N</div><div><strong>NIFTY 50 only</strong><small>Bank Nifty and Sensex are not included.</small></div></div></div>
+<div><label for="tradeDate">Historical trading date</label><input name="trade_date" id="tradeDate" type="date" required></div>
+<div><label for="expiryDate">Exact contract expiry date</label><input name="expiry_date" id="expiryDate" type="date" required><button class="secondary" id="detectExpiries" type="button" style="margin-top:7px;width:100%;padding:9px 10px">✦ Auto-detect expiries</button><select id="expiryOptions" aria-label="Available expiry dates" style="display:none;margin-top:7px"><option value="">Choose detected expiry…</option></select><div class="muted" id="expiryHint" aria-hidden="true" style="display:none"></div></div>
+</div></div>
+<div class="session-group"><div class="session-group-head"><span class="session-step">02</span><div><strong>Strike range</strong><small>Control the strike interval and number of contracts around ATM.</small></div></div><div class="grid session-grid">
+<div><label for="intervalSelect">Strike spacing</label><select name="interval" id="intervalSelect"><option value="50" selected>50 points</option><option value="100">100 points</option><option value="200">200 points</option><option value="500">500 points</option></select></div>
+<div><label for="itm_count">ITM strikes on each side</label><input name="itm_count" type="number" min="0" max="30" value="7"></div>
+<div><label for="otm_count">OTM strikes on each side</label><input name="otm_count" type="number" min="0" max="30" value="7"></div>
+</div></div>
+<div class="session-group"><div class="session-group-head"><span class="session-step">03</span><div><strong>Optional data overrides</strong><small>Leave these blank to use the automatic source whenever possible.</small></div></div><div class="grid session-grid">
+<div><label id="closeLabel" for="manualClose">NIFTY 50 close (optional manual override)</label><input id="manualClose" name="manual_close" type="number" step=".01" placeholder="Use source underlying value"></div>
+<div><label for="optionsUpload">Historical NIFTY options file (optional NSE CSV/ZIP fallback)</label><input id="optionsUpload" name="upload" type="file" accept=".csv,.zip"><div class="muted" style="font-size:11px;margin-top:5px">Automatic NSE retrieval is attempted first. Upload a compatible historical NSE CSV/ZIP only if the source is unavailable.</div></div>
+</div></div>
+<div class="session-note"><div class="info-field"><div class="info-icon">⌁</div><div><strong>HLC ATM selection is automatic and locked</strong><small>The strike with the minimum absolute difference between CE Close and PE Close across all available paired strikes is used for the HLC ATM card and existing S/R calculations. Ties prefer the strike nearest to the index close, then the lower strike. Existing formulas are unchanged.</small></div></div></div>
+<div class="actions session-actions"><button id="fetchBtn" type="submit">Fetch data</button><button class="secondary" type="button" id="clearBtn">Clear results</button></div>
+<div class="status" id="status" role="status" aria-live="polite">Choose a trading date and expiry, adjust the strike range if needed, then fetch data. Technical archive diagnostics are kept out of this status area.</div>
+</form></section></div>
+<div class="page-view" data-page="overview"><div class="page-intro"><div><h2>Market Levels</h2><p>Review calculated levels and the selected session snapshot.</p></div></div>
+<section id="summary" class="panel hidden"><div class="sectionhead"><div><div class="eyebrow">Step 2 · Market levels</div><h2>Session summary</h2></div><span class="step-chip">Exact date + expiry</span></div><div class="cards" id="metrics"></div><div class="source-box"><span class="source-dot"></span><div id="sourceInfo"></div></div></section>
+<section id="srPanel" class="panel sr-panel hidden"><div class="sr-intro"><div><div class="eyebrow">Formula engine · Closing prices only</div><h2>Support &amp; Resistance Levels</h2><p>S1 uses ATM Strike − PE Close; R1 uses ATM Strike + CE Close. S2 and R2 retain their existing formulas.</p></div><div class="sr-legend"><span class="legend-pill support">▼ SUPPORT</span><span class="legend-pill resistance">▲ RESISTANCE</span></div></div><div class="level-grid" id="srMetrics"></div><div class="calc-note" id="srCalculationNote"></div></section>
+</div>
+<div class="page-view" data-page="contracts"><div class="page-intro"><div><h2>Contract explorer</h2><p>Inspect the selected HLC ATM OHLC values and all selected strike contracts.</p></div></div>
+<section id="hlcAtmPanel" class="panel hidden"><div class="sectionhead"><div><div class="eyebrow">Step 3 · Formula inputs</div><h2>HLC ATM contract details</h2><div class="muted">The same strike is used for CE and PE. The closing prices below feed directly into support/resistance.</div></div><div class="atm-badge" id="hlcDiffBadge">Close difference: —</div></div><div class="hlc-grid"><div class="hlc-card call"><div class="hlc-title"><span class="side-pill ce-pill">CE</span><div><strong id="hlcCeStrike">—</strong><small>Call · Open / High / Low / Close</small></div></div><div class="ohlc-grid" id="hlcCeOhlc"></div></div><div class="hlc-card put"><div class="hlc-title"><span class="side-pill pe-pill">PE</span><div><strong id="hlcPeStrike">—</strong><small>Put · Open / High / Low / Close</small></div></div><div class="ohlc-grid" id="hlcPeOhlc"></div></div></div><p class="muted" id="hlcMethodNote"></p></section>
+</div>
+<div class="page-view" data-page="analytics"><div class="page-intro"><div><h2>BEP analysis</h2><p>Compare call and put closing premiums by strike.</p></div></div>
+<section id="bepPanel" class="panel bep-panel hidden"><div class="bep-intro"><div><div class="eyebrow">Step 4 · Premium calculation</div><h2>Break-Even Premium (BEP) Analysis</h2><p>BEP is calculated separately for every selected strike using the Call Close and Put Close.</p></div><span class="step-chip">Average premium only</span></div><div class="bep-toolbar"><div class="bep-selection-status"><span class="bep-selection-mark">⌁</span><div><strong id="bepSelectionLabel">Default strike range</strong><small id="bepSelectionHelp">Use the popup to select exact strikes from the available contracts.</small></div></div><div class="bep-toolbar-actions"><button type="button" id="openBepStrikePicker" class="bep-pick-button">✦ Choose BEP strikes</button><button type="button" id="resetBepStrikes" class="secondary">Default range</button></div></div><div class="bep-summary" id="bepSummary"></div><div class="bep-calc-note"><strong>Formula:</strong> BEP = (CE Close + PE Close) ÷ 2. A BEP is shown only when both Call and Put closing prices exist for that strike. These are premium-based values, not a prediction of profit or loss.</div><div id="bepEmpty" class="bep-empty hidden">No complete CE/PE closing-price pairs are available in the selected strike range, so BEP cannot be calculated.</div><div id="bepTableWrap" class="bep-table-wrap"><table class="bep-table" id="bepTable"><thead><tr><th>Strike</th><th>CE Close</th><th>PE Close</th><th>Calculation</th><th>BEP</th></tr></thead><tbody></tbody></table></div></section>
+<section id="tablePanel" class="panel hidden"><div class="table-top"><div><div class="eyebrow">Step 4 · Contract matrix</div><h2>Selected strike range</h2><div class="muted" style="font-size:12px">Call data in teal · Put data in violet · HLC ATM row highlighted in gold</div></div><div class="table-tools"><span id="tableCount" class="table-count">0 contracts</span><input id="search" placeholder="Search strike / value" aria-label="Filter strike or value"><div class="table-export-actions" role="group" aria-label="Export contract table"><button class="secondary" id="csvBtn">Export CSV</button><button class="secondary" id="xlsxBtn">Export Excel</button></div></div></div><div class="tablewrap"><table id="resultTable"><thead></thead><tbody></tbody></table></div><p class="muted table-note">Blank values mean the selected contract/field was unavailable in the source. <strong>BEP = (CE Close + PE Close) ÷ 2</strong>, calculated only when both closing prices are available.</p></section>
+</div>
+
+<div class="page-view" data-page="historical-sr">
+ <div class="page-intro"><div><h2>Historical S&amp;R Analysis</h2><p>Test the exact S1, S2, R1 and R2 values currently calculated in Market Levels against the past two years of NIFTY 50 spot candles.</p></div></div>
+ <section class="panel">
+ <div class="notice">This analysis uses the four exact prices currently shown in Overview as fixed horizontal levels across the selected range. Click Analyze once: the app automatically scans nse_5m_data (or NSE_5M_CSV_DIR) for genuine five-minute spot candles in that date range. An optional CSV upload can override the archive. Public NSE daily reports do not include historical five-minute candles, so an authorized intraday archive must be available for results.</div>
+ <section class="panel" style="margin:12px 0;background:#f8faff">
+  <div class="sectionhead"><div><div class="eyebrow">Step 1 · Levels from Market Levels</div><h2>Fixed levels to test</h2><div class="muted">Fetch the required date in Data Session first. These four values are read directly from Market Levels and remain fixed throughout the historical test.</div></div><span class="step-chip" id="fixedLevelSourceDate">No Market Levels data loaded</span></div>
+  <div class="level-grid" id="fixedLevelPreview"><div class="metric"><small>S1</small><strong id="fixedS1">—</strong></div><div class="metric"><small>S2</small><strong id="fixedS2">—</strong></div><div class="metric"><small>R1</small><strong id="fixedR1">—</strong></div><div class="metric"><small>R2</small><strong id="fixedR2">—</strong></div></div>
+ </section>
+ <form id="fixedLevelAnalysisForm"><h3>Analyze these four levels over the past two years</h3><div class="grid"><div><label for="fixedFromDate">From date</label><input id="fixedFromDate" type="date" required></div><div><label for="fixedToDate">To date</label><input id="fixedToDate" type="date" required></div><div class="wide"><label for="spotChartCandlesFile">Five-minute NIFTY 50 spot candles CSV (optional if data exists in nse_5m_data)</label><input id="spotChartCandlesFile" type="file" accept=".csv,text/csv"><div class="field-hint">Required CSV columns: timestamp, open, high, low, close. Optional: the button automatically searches the configured archive if no file is selected.</div></div></div><div class="field-hint">The default range is the latest two years. Change it only when you want a different comparison window.</div><div class="actions"><button id="fixedAnalyzeBtn" type="submit">Analyze Market Levels</button><button class="secondary" id="fixedExportCsv" type="button" disabled>Export event dates CSV</button></div><div class="status" id="fixedAnalysisStatus" role="status" aria-live="polite">Fetch option data first and confirm all four levels in Market Levels. Click Analyze to scan the configured five-minute archive automatically. If no archive is configured, the app will explain what data is missing.</div></form>
+ <section id="fixedAnalysisResults" class="hidden">
+  <section class="panel"><div class="sectionhead"><div><div class="eyebrow">Section A · Historical percentages</div><h2>How each fixed level reacted</h2><div class="muted" id="fixedCoverageMeta">No analysis yet</div></div></div><div class="tablewrap"><table id="fixedSummaryTable"><thead><tr><th>Level</th><th>Touches</th><th>Reversals</th><th>Reversal %</th><th>Breakouts</th><th>Breakout %</th><th>Breakdowns</th><th>Breakdown %</th><th>Fake breakouts</th><th>Fake BO %</th><th>Fake breakdowns</th><th>Fake BD %</th><th>Unresolved</th></tr></thead><tbody></tbody></table></div><p class="muted" style="margin-top:10px">Percentages = outcome count ÷ all grouped touches for that level × 100. Unresolved interactions remain in the denominator so the rates are not overstated.</p><div class="source-box" id="fixedSourceNote"></div></section>
+  <section class="panel" id="fixedVisualPanel"><div class="sectionhead"><div><div class="eyebrow">Section B · Visual insights</div><h2>Which reaction has the highest percentage?</h2><p class="muted">Choose one fixed level to compare its historical reaction percentages.</p></div></div><div class="grid" style="grid-template-columns:minmax(0,1fr)"><div><label for="fixedVisualLevel">Select level</label><select id="fixedVisualLevel"><option value="S1">S1 · Support 1</option><option value="S2">S2 · Support 2</option><option value="R1">R1 · Resistance 1</option><option value="R2">R2 · Resistance 2</option></select></div></div><div id="fixedVisualHeadline" class="status" style="margin-top:12px">Run the analysis to see the most common reaction.</div><div id="fixedVisualBars" class="fixed-visual-bars" aria-live="polite"></div><p class="field-hint">Percentages use all grouped touch interactions for the selected level as the denominator, including unresolved interactions. This is historical frequency, not a forecast.</p></section>
+  <section class="panel"><div class="sectionhead"><div><div class="eyebrow">Section C · Event dates</div><h2>Dates and times each level reacted</h2><span class="muted" id="fixedEventCount">0 interactions</span><p class="muted" style="margin:4px 0 0">Fixed-height log · scroll inside this panel to view every matching interaction; use the filters to narrow results.</p></div><div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr));min-width:260px"><div><label for="fixedFilterLevel">Level</label><select id="fixedFilterLevel"><option value="">All levels</option><option>S1</option><option>S2</option><option>R1</option><option>R2</option></select></div><div><label for="fixedFilterType">Reaction</label><select id="fixedFilterType"><option value="">All reactions</option><option>Reversal</option><option>Breakout</option><option>Breakdown</option><option>Fake Breakout</option><option>Fake Breakdown</option><option>Unresolved</option></select></div></div></div><div class="tablewrap fixed-events-scroll" id="fixedEventsTableWrap"><table id="fixedEventsTable"><thead><tr><th>Date</th><th>Time (IST)</th><th>Level</th><th>Fixed level price</th><th>Reaction</th><th>Approach side</th><th>Spot O</th><th>Spot H</th><th>Spot L</th><th>Spot C</th><th>Confirmation time</th><th>Points vs level</th><th>Explanation</th></tr></thead><tbody></tbody></table></div></section>
+ </section>
+ <form id="historicalSrAutoForm" class="hidden"><h3>Analyze a historical date range</h3><p class="muted">Choose the dates and click Analyze once. The app calculates that trading day’s S1, S2, R1 and R2 using the existing formula engine, then checks genuine five-minute candles for touches, reversals, breakouts, breakdowns and failed breaks.</p><div class="grid"><div><label for="srAutoStart">From date</label><input id="srAutoStart" type="date" required></div><div><label for="srAutoEnd">To date</label><input id="srAutoEnd" type="date" required></div></div><div class="actions"><button id="srAutoBtn" type="submit">Analyze selected date range</button></div><div class="status" id="srAutoStatus" role="status" aria-live="polite">Select a date range and click Analyze. Progress, daily S&amp;R levels, and event results will be shown below. No missing market data is fabricated.</div></form>
+ <section id="srNseLevelsPanel" class="panel hidden" style="margin-top:14px"><div class="sectionhead"><div><div class="eyebrow">NSE daily options levels</div><h2>Fetched results by trading date</h2><div class="muted" id="srNseLevelsMeta">No data loaded</div></div><button class="secondary" id="srNseLevelsCsv" type="button">Export table CSV</button></div><div class="tablewrap"><table id="srNseLevelsTable"><thead><tr><th>Target date</th><th>Source date</th><th>Expiry</th><th>HLC ATM</th><th>CE close</th><th>PE close</th><th>S1</th><th>R1</th><th>S2</th><th>R2</th></tr></thead><tbody></tbody></table></div><p class="muted" id="srNseLevelsFoot" style="margin-top:10px">Rows contain only levels calculated from available NSE bhavcopy data. Dates that could not be fetched are reported separately.</p></section>
+<section class="panel" id="niftySpotLevelsChartPanel" style="margin-top:14px"><div class="sectionhead"><div><div class="eyebrow">NIFTY 50 spot chart</div><h2>NIFTY 50 spot chart with Market Levels</h2><div class="muted">All genuine five-minute NIFTY 50 OHLC candles in the selected range, with adjustable zoom and S1/S2/R1/R2 overlays from Market Levels.</div></div></div><div class="grid" style="grid-template-columns:repeat(4,minmax(0,1fr));align-items:end"><div><label for="spotChartFromDate">From date</label><input id="spotChartFromDate" type="date" required></div><div><label for="spotChartToDate">To date</label><input id="spotChartToDate" type="date" required></div><div><label for="spotChartDate">Level date (when daily levels are used)</label><select id="spotChartDate" disabled><option value="">Load chart candles first</option></select></div><div><button id="loadSpotChart" type="button" style="width:100%">Load spot chart</button></div><div class="wide"><label for="spotChartWindow">Visible candles <span id="spotChartWindowLabel">All candles</span></label><input id="spotChartWindow" type="range" min="20" max="300" step="10" value="300" disabled><div class="field-hint">Choose a date range to load and plot every returned five-minute candle. The slider zooms the visible candle count; the level-date selector is only used when daily NSE levels are the fallback.</div></div></div><div id="spotChartStatus" class="status" role="status" aria-live="polite">Market Levels from Data Session will be overlaid on genuine five-minute NIFTY 50 candles for the date range you choose. No prices are generated if the archive is unavailable.</div><div class="chart-depth-stage" style="width:100%;height:440px;margin-top:12px;position:relative"><div class="chart-depth-frame"><canvas id="niftySpotLevelsCanvas" style="width:100%;height:100%;display:block"></canvas></div><div class="chart-depth-caption">DEPTH VIEW · genuine candle/close data and fixed S&amp;R levels · perspective is visual only</div></div><div class="sr-legend" style="margin-top:12px"><span class="legend-pill support">S1 / S2 · Support</span><span class="legend-pill resistance">R1 / R2 · Resistance</span><span class="muted">Validated five-minute OHLC candles are shown when usable; the original close trace remains the fallback. Horizontal lines are the selected date's calculated levels.</span></div></section>
+ <details class="panel hidden" style="margin-top:14px"><summary style="cursor:pointer;font-weight:700">Legacy manual CSV fallback (hidden)</summary><div style="padding-top:12px"><p class="muted">Use this only if you already have genuine five-minute spot candles and a daily level CSV.</p>
+ <form id="historicalSrForm"><div class="grid">
+ <div class="wide"><label>5-minute NIFTY spot candles CSV</label><input id="srCandlesFile" type="file" accept=".csv,text/csv" required><div class="field-hint">Required columns: timestamp, open, high, low, close. Timestamp may be DD-MM-YYYY HH:MM or ISO; timezone-naive timestamps are interpreted as IST.</div></div>
+ <div class="wide"><label>Daily historical levels CSV</label><input id="srLevelsFile" type="file" accept=".csv,text/csv" required><div class="field-hint">Required columns: date, S1, R1, S2, R2. One row per session, calculated using only the existing formula engine's appropriate prior-session inputs.</div></div>
+ <div><label>Touch tolerance (points)</label><input id="srTolerance" type="number" min="0" step="0.5" value="2"></div>
+ <div><label>Reversal distance (points)</label><input id="srReversal" type="number" min="1" step="1" value="15"></div>
+ <div><label>Reversal confirmation candles</label><input id="srConfirmCandles" type="number" min="1" max="30" value="3"></div>
+ <div><label>Failed-break window (candles)</label><input id="srFailedCandles" type="number" min="1" max="60" value="6"></div>
+ <div><label>Reset distance (points)</label><input id="srReset" type="number" min="0" step="1" value="10"></div>
+ </div><div class="actions"><button id="srAnalyzeBtn" type="submit">Analyze uploaded CSVs</button></div><div class="status" id="srStatus" role="status">Upload actual candle and date-specific level CSV files to begin. No data is analyzed until you submit both files.</div></form></div></details></section>
+ <section id="srHistoricalResults" class="hidden">
+ <section class="panel"><div class="sectionhead"><div><div class="eyebrow">Verified input coverage</div><h2>Analysis summary</h2></div><span class="step-chip" id="srCoverage">No results</span></div><div class="cards" id="srSummaryCards"></div><div class="source-box" id="srDataNote"></div></section>
+ <section class="panel"><div class="sectionhead"><h2>Level-by-level statistics</h2><span class="muted">Reversal rate = confirmed reversals ÷ grouped touch events</span></div><div class="tablewrap"><table id="srStatsTable"><thead><tr><th>Level</th><th>Touches</th><th>Confirmed reversals</th><th>Potential reversals</th><th>Breakouts</th><th>Breakdowns</th><th>Fake breakouts</th><th>Fake breakdowns</th><th>Reversal rate</th></tr></thead><tbody></tbody></table></div></section>
+ <section class="panel"><div class="sectionhead"><h2>Event counts by level</h2><span class="muted">Calculated from returned event log</span></div><div id="srLevelChart" class="cards"></div></section>
+ <section class="panel"><div class="sectionhead"><h2>Monthly event distribution</h2><span class="muted">Only actual events in the uploaded data</span></div><div id="srMonthlyChart" class="cards"></div></section>
+ <section class="panel"><div class="sectionhead"><div><h2>Historical event log</h2><span class="muted" id="srEventCount">0 events</span></div><div class="actions"><button class="secondary" id="srDownloadCsv" type="button" disabled>Export events CSV</button><button class="secondary" id="srDownloadXlsx" type="button" disabled>Export Excel</button></div></div><div class="grid"><div><label>Level</label><select id="srFilterLevel"><option value="">All levels</option><option>S1</option><option>R1</option><option>S2</option><option>R2</option></select></div><div><label>Event type</label><select id="srFilterType"><option value="">All event types</option><option>Touch</option><option>Reversal</option><option>Potential Reversal</option><option>Breakout</option><option>Breakdown</option><option value="Failed Breakout">Fake breakout (failed)</option><option value="Failed Breakdown">Fake breakdown (failed)</option></select></div><div><label>From date</label><input id="srFilterFrom" type="date"></div><div><label>To date</label><input id="srFilterTo" type="date"></div></div><div class="tablewrap" style="margin-top:12px"><table id="srEventsTable"><thead><tr><th>Event date</th><th>Event time (IST)</th><th>Level</th><th>Level value</th><th>Type</th><th>Open</th><th>High</th><th>Low</th><th>Close</th><th>Initial date/time</th><th>Confirmation date/time</th><th>Distance (pts)</th><th>Result (pts)</th><th>Status</th><th>Explanation</th></tr></thead><tbody></tbody></table></div><div class="actions"><button class="secondary" id="srPrevPage" type="button">Previous</button><span id="srPageInfo" class="muted">Page 1</span><button class="secondary" id="srNextPage" type="button">Next</button></div></section>
+ </section>
+</div>
+
+<div class="page-view" data-page="guide"><div class="page-intro"><div><h2>Formula guide</h2><p>Calculation definitions used by this dashboard.</p></div></div>
+<section class="panel"><div class="eyebrow">Reference guide</div><h2>Calculation rules</h2><div class="formulanote"><strong>HLC ATM strike</strong> = strike with the minimum absolute |CE Close − PE Close| across all available paired CE/PE strikes for the selected date and expiry.<div class="formula-row"><div class="formula-chip"><span>BEP</span> (CE Close + PE Close) ÷ 2</div><div class="formula-chip"><span>S1</span> ATM Strike − HLC ATM PE Close</div><div class="formula-chip"><span>R1</span> ATM Strike + HLC ATM CE Close</div><div class="formula-chip"><span>S2</span> ATM Strike − (HLC ATM CE Close + HLC ATM PE Close)</div><div class="formula-chip"><span>R2</span> ATM Strike + (HLC ATM CE Close + HLC ATM PE Close)</div></div><div class="muted" style="margin-top:10px;font-size:12px">Important: “HLC ATM” names the selected strike. These calculations use the CE and PE <strong>closing prices directly</strong>; High and Low are not averaged into support/resistance.</div></div><h2 style="margin-top:20px">Cloud access</h2><p class="muted">Deploy this project to a cloud web host for a URL that works on Android without your PC running. Public exchange pages may rate-limit or change; the dashboard reports source and errors instead of fabricating rows.</p></section></div>
+</main></div>
+<dialog id="bepStrikeDialog" class="bep-strike-dialog" aria-labelledby="bepDialogTitle">
+ <div class="bep-dialog-shell">
+  <div class="bep-dialog-head"><div><div class="eyebrow">BEP FILTER · EXACT STRIKES</div><h2 id="bepDialogTitle">Choose the strikes to compare</h2><p>Pick one or more strikes that exist in the selected date and expiry. No synthetic strikes are added.</p></div><button class="dialog-close" type="button" id="closeBepStrikeDialog" aria-label="Close strike selector">×</button></div>
+  <div class="bep-dialog-tools"><label class="bep-search-wrap"><span>⌕</span><input type="search" id="bepStrikeSearch" placeholder="Search strike, e.g. 22100" autocomplete="off" aria-label="Search available strikes"></label><button type="button" class="secondary" id="selectVisibleBepStrikes">Select visible</button><button type="button" class="secondary" id="clearBepStrikeSelection">Clear picks</button></div>
+  <div class="bep-strike-list" id="bepStrikeOptions" role="group" aria-label="Available strikes"><div class="bep-picker-empty">Fetch a session first to load its available strikes.</div></div>
+  <div class="bep-dialog-foot"><span id="bepStrikeSelectedCount" aria-live="polite">0 selected · default range active</span><div><button type="button" class="secondary" id="cancelBepStrikePicker">Cancel</button><button type="button" id="applyBepStrikeSelection">Apply selection</button></div></div>
+ </div>
+</dialog>
+<script>
+let current=null, sortKey='strike', sortAsc=true;
+let selectedBepStrikes=[], pendingBepStrikes=[];
+const $=id=>document.getElementById(id);
+const fmt=v=>v===null||v===undefined||v===''||Number.isNaN(Number(v))?'—':Number(v).toLocaleString('en-IN',{maximumFractionDigits:2});
+const form=$('fetchForm');
+const indexNames={NIFTY:'NIFTY 50'};
+let intervalManuallyChanged=false;
+$('intervalSelect').addEventListener('change',()=>{intervalManuallyChanged=true;});
+async function discoverExpiries(showStatus=true){
+ const symbol=$('indexSelect').value, tradeDate=$('tradeDate').value, keep=$('expiryDate').value;
+ if(!tradeDate){return}
+ const b=$('detectExpiries');b.disabled=true;b.textContent='Finding expiries…';
+ $('expiryOptions').style.display='block';$('expiryOptions').innerHTML='<option value="">Contacting exchange source…</option>';
+ $('expiryHint').textContent='';
+ try{
+  const r=await fetch('/api/expiries?symbol='+encodeURIComponent(symbol)+'&trade_date='+encodeURIComponent(tradeDate));const d=await r.json();if(!r.ok)throw new Error(d.detail||'Expiry discovery failed');
+  const dates=(d.expiries||[]).filter(Boolean);if(!dates.length)throw new Error('NSE returned no expiry dates for this session.');
+  $('expiryOptions').innerHTML='<option value="">Choose detected expiry…</option>'+dates.map(x=>'<option value="'+x+'">'+x+'</option>').join('');
+  const chosen=dates.includes(keep)?keep:dates[0];$('expiryDate').value=chosen;$('expiryOptions').value=chosen;$('expiryHint').textContent='';
+  if(showStatus)$('status').textContent='Expiry discovery succeeded for '+indexNames[symbol]+'. Selected '+chosen+'. Source: '+d.source;
+ }catch(err){$('expiryOptions').innerHTML='<option value="">Choose expiry manually</option>';$('expiryHint').textContent='';$('expiryOptions').style.display='none';}
+ finally{b.disabled=false;b.textContent='✦ Auto-detect expiries'}
+}
+$('expiryOptions').addEventListener('change',e=>{if(e.target.value)$('expiryDate').value=e.target.value});
+$('detectExpiries').addEventListener('click',()=>discoverExpiries(true));
+$('tradeDate').addEventListener('change',()=>discoverExpiries(false));
+$('closeLabel').textContent='NIFTY 50 close (optional manual override)';
+form.addEventListener('submit',async e=>{
+ e.preventDefault(); const btn=$('fetchBtn');btn.disabled=true;btn.textContent='Fetching…';current=null;selectedBepStrikes=[];pendingBepStrikes=[];$('summary').classList.add('hidden');$('srPanel').classList.add('hidden');$('tablePanel').classList.add('hidden');$('hlcAtmPanel').classList.add('hidden');$('bepPanel').classList.add('hidden');$('status').textContent='Automatic retrieval running for '+indexNames[$('indexSelect').value]+'. The selected trading date and expiry will not be substituted.';
+ try{
+  const fd=new FormData(form);
+  if(!fd.get('manual_close'))fd.delete('manual_close');
+  if(!fd.get('manual_atm'))fd.delete('manual_atm');
+  if(!fd.get('ce_manual'))fd.delete('ce_manual');
+  if(!fd.get('pe_manual'))fd.delete('pe_manual');
+  if(!fd.get('upload')?.name)fd.delete('upload');
+  const res=await fetch('/api/fetch',{method:'POST',body:fd});
+  const data=await res.json();if(!res.ok)throw new Error(data.detail||'Request failed');
+  current=data;render(data);$('status').textContent='Success: exact trading date and expiry returned. Review the source label and warnings.';
+ }catch(err){$('status').textContent='Could not retrieve the exact requested contracts.\n'+err.message+'\nNo alternative date or expiry was substituted. If the exchange blocks automatic access, upload its compatible CSV/ZIP.';}
+ finally{btn.disabled=false;btn.textContent='Fetch data';}
+});
+function render(d){
+ $('summary').classList.remove('hidden');$('srPanel').classList.remove('hidden');$('hlcAtmPanel').classList.remove('hidden');$('bepPanel').classList.remove('hidden');$('tablePanel').classList.remove('hidden');
+ const metrics=[['Index',d.index_name||d.symbol],['Trading date',d.trade_date],['Selected expiry',d.expiry_date],[d.index_name+' close',fmt(d.index_close??d.nifty_close)],['HLC ATM strike',fmt(d.atm)],['Available contract rows',d.available_contract_rows],['CE contracts',d.ce_contracts],['PE contracts',d.pe_contracts],['Status',d.status]];
+ $('metrics').innerHTML=metrics.map(([a,b])=>`<div class="metric"><small>${a}</small><strong>${b}</strong></div>`).join('');
+ $('sourceInfo').textContent='Source: '+d.source+' | Index close source: '+(d.index_close_source||d.nifty_close_source)+' | '+d.warning;
+ const sr=d.support_resistance||{}, numOrNaN=v=>(v===null||v===undefined||v==='')?NaN:Number(v), atm=numOrNaN(d.atm), ce=numOrNaN(d.ce_reference), pe=numOrNaN(d.pe_reference), spot=numOrNaN(d.index_close??d.nifty_close);
+ const calc=(key)=>{if(!Number.isFinite(atm))return 'ATM strike unavailable';if(key==='S1')return Number.isFinite(pe)?`${fmt(atm)} − ${fmt(pe)} = ${fmt(sr.S1)}`:'HLC ATM PE Close unavailable';if(key==='R1')return Number.isFinite(ce)?`${fmt(atm)} + ${fmt(ce)} = ${fmt(sr.R1)}`:'HLC ATM CE Close unavailable';if(!Number.isFinite(ce)||!Number.isFinite(pe))return 'Both HLC ATM closing prices are required';return key==='S2'?`${fmt(atm)} − (${fmt(ce)} + ${fmt(pe)}) = ${fmt(sr.S2)}`:`${fmt(atm)} + (${fmt(ce)} + ${fmt(pe)}) = ${fmt(sr.R2)}`};
+ const levelInfo=[['S1','Support 1','s1','Support'],['R1','Resistance 1','r1','Resistance'],['S2','Support 2','s2','Support'],['R2','Resistance 2','r2','Resistance']];
+ $('srMetrics').innerHTML=levelInfo.map(([key,label,tone,kind])=>`<article class="level-card ${tone}"><div class="level-top"><span class="level-code">${key}</span><span class="level-kind">${kind}</span></div><div class="level-value">${fmt(sr[key])}</div><div class="level-formula">${key==='S1'?'ATM Strike − PE Close':key==='R1'?'ATM Strike + CE Close':key==='S2'?'ATM Strike − (CE Close + PE Close)':'ATM Strike + (CE Close + PE Close)'}</div><div class="level-math">${calc(key)}</div></article>`).join('');
+ $('srCalculationNote').innerHTML=`<strong>Calculation inputs:</strong> Index Close = ${fmt(spot)} &nbsp; · &nbsp; HLC ATM CE Close = ${fmt(ce)} &nbsp; · &nbsp; HLC ATM PE Close = ${fmt(pe)}. Values above use these closing prices directly, not (High + Low + Close) ÷ 3.`;
+ refreshFixedLevelPreview();renderHlcAtm(d);renderBep(d);renderTable();if(spotChartCandles.length)spotDrawChart();
+}
+function renderHlcAtm(d){
+ const h=d.hlc_atm||{};$('hlcAtmPanel').classList.remove('hidden');
+ $('hlcCeStrike').textContent=fmt(h.strike)+' CE';$('hlcPeStrike').textContent=fmt(h.strike)+' PE';
+ $('hlcDiffBadge').textContent='|CE Close − PE Close| = '+fmt(h.close_difference);
+ const cells=(obj)=>[['Open',obj?.open],['High',obj?.high],['Low',obj?.low],['Close',obj?.close]].map(([label,val])=>`<div class="ohlc-cell ${label==='Close'?'close-cell':''}"><small>${label}</small><strong>${fmt(val)}</strong></div>`).join('');
+ $('hlcCeOhlc').innerHTML=cells(h.ce);$('hlcPeOhlc').innerHTML=cells(h.pe);
+ $('hlcMethodNote').textContent=(h.selection_method==='hlc_min_diff'?'Selected by minimum absolute CE/PE close difference across all available paired strikes.':'ATM selected by '+h.selection_method+'.')+' Tie-break: closest to index close. Confirm the source data before trading.';
+}
+function renderBep(d){
+ const availableRows=Array.isArray(d.all_available_rows)?d.all_available_rows:null;
+ const defaultRows=Array.isArray(d.bep_analysis)?d.bep_analysis:(d.rows||[]).map(r=>({strike:r.strike,ce_close:r.ce_close,pe_close:r.pe_close,bep:r.bep}));
+ const selected=selectedBepStrikes.length>0;
+ const rows=selected&&availableRows?availableRows.filter(r=>selectedBepStrikes.includes(Number(r.strike))):defaultRows;
+ const allRows=availableRows||defaultRows;
+ const atm=Number(d.atm), h=d.hlc_atm||{};
+ const atmRow=allRows.find(r=>Number(r.strike)===atm);
+ const atmC=atmRow?.ce_close, atmP=atmRow?.pe_close;
+ const atmBep=atmC!==null&&atmC!==undefined&&atmC!==''&&atmP!==null&&atmP!==undefined&&atmP!==''&&Number.isFinite(Number(atmC))&&Number.isFinite(Number(atmP))?(Number(atmC)+Number(atmP))/2:null;
+ const validClose=r=>r.ce_close!==null&&r.ce_close!==undefined&&r.ce_close!==''&&r.pe_close!==null&&r.pe_close!==undefined&&r.pe_close!==''&&Number.isFinite(Number(r.ce_close))&&Number.isFinite(Number(r.pe_close));
+ const paired=rows.filter(validClose);
+ $('bepSelectionLabel').textContent=selected?`${selectedBepStrikes.length} strike${selectedBepStrikes.length===1?'':'s'} selected`:'Default strike range';
+ $('bepSelectionHelp').textContent=selected?`Showing ${rows.length} selected strike${rows.length===1?'':'s'} from ${allRows.length} available source strikes.`:`Showing ${rows.length} rows in the original configured range. ${allRows.length} source strikes are available in the popup.`;
+ $('bepSummary').innerHTML=[['HLC ATM Strike',fmt(d.atm)],['ATM CE Close',fmt(h.ce?.close)],['ATM PE Close',fmt(h.pe?.close)],['ATM BEP',atmBep===null?'—':fmt(atmBep)],['Valid BEP rows',`${paired.length} / ${rows.length}`]].map(([label,value],i)=>`<div class="bep-metric" style="--metric-order:${i}"><small>${label}</small><strong>${value}</strong></div>`).join('');
+ const tbody=$('bepTable').querySelector('tbody');
+ tbody.innerHTML=rows.map((r,i)=>{
+   const c=r.ce_close===null||r.ce_close===undefined||r.ce_close===''?NaN:Number(r.ce_close), p=r.pe_close===null||r.pe_close===undefined||r.pe_close===''?NaN:Number(r.pe_close);
+   const valid=Number.isFinite(c)&&Number.isFinite(p), calculated=valid?(c+p)/2:null;
+   const formula=valid?`(${fmt(c)} + ${fmt(p)}) ÷ 2 = ${fmt(calculated)}`:'Unavailable — CE or PE Close missing';
+   return `<tr class="${Number(r.strike)===atm?'hlc-bep-row':''}" style="--row-order:${Math.min(i,18)}"><td>${fmt(r.strike)}${Number(r.strike)===atm?' ★ ATM':''}</td><td>${fmt(valid?c:null)}</td><td>${fmt(valid?p:null)}</td><td>${formula}</td><td class="bep-value">${fmt(calculated)}</td></tr>`;
+ }).join('');
+ const hasBep=paired.length>0;$('bepEmpty').classList.toggle('hidden',hasBep);$('bepTableWrap').classList.toggle('hidden',!rows.length);
+ $('bepEmpty').textContent=selected?'The selected strikes do not contain any complete CE/PE closing-price pairs. Clear the selection or choose different strikes.':'No complete CE/PE closing-price pairs are available in the default strike range.';
+}
+function buildBepStrikeOptions(){
+ const container=$('bepStrikeOptions');if(!container)return;
+ const strikes=Array.isArray(current?.available_strikes_in_file)?current.available_strikes_in_file:[];
+ if(!strikes.length){container.innerHTML='<div class="bep-picker-empty">No source strikes are available. Fetch a historical session or upload a compatible NSE file first.</div>';updateBepSelectionCount();return;}
+ const selected=new Set(pendingBepStrikes);
+ container.innerHTML=strikes.map(v=>{const n=Number(v);return `<label class="bep-strike-option" data-strike="${n}"><input type="checkbox" value="${n}" ${selected.has(n)?'checked':''}><span class="strike-option-number">${fmt(n)}</span><span class="strike-option-tag">${n===Number(current.atm)?'HLC ATM':'Strike'}</span></label>`}).join('');
+ container.querySelectorAll('input[type="checkbox"]').forEach(input=>input.addEventListener('change',updateBepSelectionCount));
+ filterBepStrikeOptions();updateBepSelectionCount();
+}
+function filterBepStrikeOptions(){
+ const q=($('bepStrikeSearch')?.value||'').trim().toLowerCase();
+ $('bepStrikeOptions')?.querySelectorAll('.bep-strike-option').forEach(el=>{el.hidden=!!q&&!el.dataset.strike.includes(q)});
+}
+function updateBepSelectionCount(){
+ const options=[...($('bepStrikeOptions')?.querySelectorAll('input[type="checkbox"]')||[])];
+ const picked=options.filter(el=>el.checked).length;
+ const selectedCount=$('bepStrikeSelectedCount');if(selectedCount)selectedCount.textContent=picked?`${picked} selected · only source-available strikes`:'0 selected · default range will be used';
+ const selectVisible=$('selectVisibleBepStrikes');if(selectVisible){const visible=options.filter(el=>!el.closest('.bep-strike-option')?.hidden);selectVisible.textContent=visible.length&&visible.every(el=>el.checked)?'Deselect visible':'Select visible';}
+}
+function openBepStrikeDialog(){
+ if(!current){$('status').textContent='Fetch a historical session before selecting BEP strikes.';return;}
+ pendingBepStrikes=[...selectedBepStrikes];$('bepStrikeSearch').value='';buildBepStrikeOptions();
+ const dialog=$('bepStrikeDialog');if(typeof dialog.showModal==='function')dialog.showModal();else dialog.setAttribute('open','');
+}
+$('openBepStrikePicker').addEventListener('click',openBepStrikeDialog);
+$('closeBepStrikeDialog').addEventListener('click',()=> $('bepStrikeDialog').close?.());
+$('cancelBepStrikePicker').addEventListener('click',()=> $('bepStrikeDialog').close?.());
+$('bepStrikeSearch').addEventListener('input',filterBepStrikeOptions);
+$('selectVisibleBepStrikes').addEventListener('click',()=>{
+ const inputs=[...$('bepStrikeOptions').querySelectorAll('.bep-strike-option:not([hidden]) input[type="checkbox"]')];
+ const shouldSelect=inputs.some(input=>!input.checked);inputs.forEach(input=>input.checked=shouldSelect);updateBepSelectionCount();
+});
+$('clearBepStrikeSelection').addEventListener('click',()=>{$('bepStrikeOptions').querySelectorAll('input[type="checkbox"]').forEach(input=>input.checked=false);updateBepSelectionCount();});
+$('applyBepStrikeSelection').addEventListener('click',()=>{
+ selectedBepStrikes=[...$('bepStrikeOptions').querySelectorAll('input[type="checkbox"]:checked')].map(input=>Number(input.value)).filter(Number.isFinite).sort((a,b)=>a-b);
+ if(current)renderBep(current);$('bepStrikeDialog').close?.();
+});
+$('resetBepStrikes').addEventListener('click',()=>{selectedBepStrikes=[];if(current)renderBep(current);});
+$('bepStrikeDialog').addEventListener('click',event=>{if(event.target===$('bepStrikeDialog'))$('bepStrikeDialog').close?.();});
+const cols=[['strike','Strike'],['ce_available','CE?'],['ce_open','CE Open'],['ce_high','CE High'],['ce_low','CE Low'],['ce_close','CE Close'],['ce_ltp','CE LTP'],['ce_settlement','CE Settle'],['ce_volume','CE Volume'],['ce_oi','CE OI'],['pe_available','PE?'],['pe_open','PE Open'],['pe_high','PE High'],['pe_low','PE Low'],['pe_close','PE Close'],['pe_ltp','PE LTP'],['pe_settlement','PE Settle'],['pe_volume','PE Volume'],['pe_oi','PE OI'],['bep','BEP']];
+function renderTable(){
+ if(!current)return;
+ let rows=current.rows.slice();const q=$('search').value.trim().toLowerCase();if(q)rows=rows.filter(r=>JSON.stringify(r).toLowerCase().includes(q));
+ rows.sort((a,b)=>{let x=a[sortKey],y=b[sortKey];if(x==null)return 1;if(y==null)return -1;return (x>y?1:x<y?-1:0)*(sortAsc?1:-1)});
+ const ceCols=cols.filter(([k])=>k.startsWith('ce_')), peCols=cols.filter(([k])=>k.startsWith('pe_'));
+ $('resultTable').querySelector('thead').innerHTML='<tr class="group-row"><th rowspan="2" class="strike-head" data-key="strike">Strike</th><th colspan="'+ceCols.length+'" class="ce-group">Calls · CE</th><th colspan="'+peCols.length+'" class="pe-group">Puts · PE</th><th rowspan="2" class="bep-head" data-key="bep">BEP</th></tr><tr class="sub-row">'+[...ceCols,...peCols].map(([k,l])=>`<th data-key="${k}" class="${k.startsWith('ce_')?'ce-col':'pe-col'}">${l}${sortKey===k?(sortAsc?' ↑':' ↓'):''}</th>`).join('')+'</tr>';
+ $('resultTable').querySelector('tbody').innerHTML=rows.map(r=>'<tr class="'+(Number(r.strike)===Number(current.atm)?'hlc-row':'')+'">'+cols.map(([k])=>`<td class="${k.startsWith('ce_')?'ce-col':k.startsWith('pe_')?'pe-col':k==='bep'?'bep-col':''}">${typeof r[k]==='boolean'?(r[k]?'Yes':'No'):fmt(r[k])}</td>`).join('')+'</tr>').join('');
+ $('tableCount').textContent=`${rows.length} / ${current.rows.length} rows`; 
+ $('resultTable').querySelectorAll('th[data-key]').forEach(th=>th.onclick=()=>{if(sortKey===th.dataset.key)sortAsc=!sortAsc;else{sortKey=th.dataset.key;sortAsc=true}renderTable()});
+}
+$('search').addEventListener('input',renderTable);
+async function exportFile(kind){
+ if(!current)return;const rows=current.rows.map(r=>({...r,trade_date:current.trade_date,expiry_date:current.expiry_date,index_close:current.index_close??current.nifty_close,nifty_close:current.nifty_close,source:current.source}));
+ const res=await fetch('/api/export/'+kind,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rows,metadata:{symbol:current.symbol,index_name:current.index_name,trade_date:current.trade_date,expiry_date:current.expiry_date,index_close:current.index_close??current.nifty_close,nifty_close:current.nifty_close,atm:current.atm,source:current.source}})});
+ if(!res.ok){alert('Export failed');return}const blob=await res.blob(),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(current.symbol||'index').toLowerCase()+(kind==='csv'?'_options.csv':'_options.xlsx');a.click();URL.revokeObjectURL(url);
+}
+$('csvBtn').onclick=()=>exportFile('csv');$('xlsxBtn').onclick=()=>exportFile('xlsx');
+$('clearBtn').onclick=()=>{current=null;$('summary').classList.add('hidden');$('srPanel').classList.add('hidden');$('hlcAtmPanel').classList.add('hidden');$('bepPanel').classList.add('hidden');$('tablePanel').classList.add('hidden');$('status').textContent='Results cleared. Your selected index and dates remain unchanged.'};
+const today=new Date();const localToday=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');$('tradeDate').value=localToday;$('expiryDate').value=localToday;discoverExpiries(false);
+
+const pageMeta={overview:['Market Levels','Support, resistance and selected-session values'],session:['Data session','Configure historical date, expiry, strike spacing and data source'],contracts:['Contracts','Inspect HLC ATM OHLC values and the selected strike matrix'],analytics:['BEP analysis','Compare call and put closing premiums by strike'],guide:['Formula guide','Understand the calculation rules used in this workspace'],'historical-sr':['Historical S&R Analysis','Test exact Market Levels S1/S2/R1/R2 values as fixed levels against past spot candles']};
+function showPage(page){if(!pageMeta[page])page='session';document.querySelectorAll('.page-view').forEach(el=>el.classList.toggle('active',el.dataset.page===page));document.querySelectorAll('[data-page-target]').forEach(el=>el.classList.toggle('active',el.dataset.pageTarget===page));$('pageTitle').textContent=pageMeta[page][0];$('pageSubtitle').textContent=pageMeta[page][1];try{history.replaceState(null,'','#'+page)}catch(e){}}
+document.querySelectorAll('[data-page-target]').forEach(btn=>btn.addEventListener('click',()=>showPage(btn.dataset.pageTarget)));
+window.addEventListener('hashchange',()=>showPage(location.hash.slice(1)||'session'));
+const themeToggle=$('themeToggle');function setTheme(theme){document.documentElement.dataset.theme=theme;themeToggle.textContent=theme==='dark'?'☀ Light mode':'☾ Dark mode';themeToggle.setAttribute('aria-pressed',String(theme==='dark'));try{localStorage.setItem('nifty-dashboard-theme',theme)}catch(e){}}
+let initialTheme='light';try{initialTheme=localStorage.getItem('nifty-dashboard-theme')||'light'}catch(e){}setTheme(initialTheme);themeToggle.addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
+showPage(location.hash.slice(1)||'session');
+(function(){const intro=$('brandIntro');if(!intro)return;let seen=false;try{seen=sessionStorage.getItem('nifty-lab-intro-seen')==='1'}catch(e){}if(seen||matchMedia('(prefers-reduced-motion: reduce)').matches){intro.remove();return}const dismiss=()=>{intro.classList.add('is-leaving');try{sessionStorage.setItem('nifty-lab-intro-seen','1')}catch(e){}setTimeout(()=>intro.remove(),720)};$('skipIntro')?.addEventListener('click',dismiss);setTimeout(dismiss,3100)})();
+document.querySelectorAll('.side-nav').forEach(nav=>nav.addEventListener('keydown',event=>{
+ if(!['ArrowRight','ArrowLeft'].includes(event.key))return;
+ const tabs=Array.from(nav.querySelectorAll('[data-page-target]'));const i=tabs.indexOf(document.activeElement);if(i<0)return;
+ event.preventDefault();const next=(i+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;tabs[next].focus();tabs[next].click();
+}));
+
+
+let historicalSrResult=null, srPage=1; const srPageSize=100;
+const sr$=id=>document.getElementById(id);
+function srEscape(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function srDatePart(v){return String(v||'').slice(0,10)}
+function filteredSrEvents(){if(!historicalSrResult)return [];let a=historicalSrResult.events||[];const l=sr$('srFilterLevel').value,t=sr$('srFilterType').value,f=sr$('srFilterFrom').value,to=sr$('srFilterTo').value;return a.filter(e=>(!l||e.level===l)&&(!t||e.event_type===t)&&(!f||e.event_date>=f)&&(!to||e.event_date<=to));}
+function renderSrEvents(){if(!historicalSrResult)return;const all=filteredSrEvents(),pages=Math.max(1,Math.ceil(all.length/srPageSize));srPage=Math.min(srPage,pages);const shown=all.slice((srPage-1)*srPageSize,srPage*srPageSize);sr$('srEventsTable').querySelector('tbody').innerHTML=shown.map(e=>`<tr><td>${srEscape(e.event_date)}</td><td>${srEscape((e.event_time||'').split(' ').slice(-1)[0])}</td><td>${srEscape(e.level)}</td><td>${e.level_value}</td><td>${srEscape(e.event_type==='Failed Breakout'?'Fake Breakout (failed)':e.event_type==='Failed Breakdown'?'Fake Breakdown (failed)':e.event_type)}</td><td>${e.spot_open}</td><td>${e.spot_high}</td><td>${e.spot_low}</td><td>${e.spot_close}</td><td>${srEscape(e.initial_event_datetime)}</td><td>${srEscape(e.confirmation_datetime)}</td><td>${e.distance_points??''}</td><td>${e.result_points??''}</td><td>${srEscape(e.status)}</td><td>${srEscape(e.explanation)}</td></tr>`).join('');sr$('srEventCount').textContent=`${all.length} events (filtered from ${historicalSrResult.events.length})`;sr$('srPageInfo').textContent=`Page ${srPage} of ${pages}`;sr$('srPrevPage').disabled=srPage<=1;sr$('srNextPage').disabled=srPage>=pages;}
+function renderSrResult(d){historicalSrResult=d;srPage=1;sr$('srHistoricalResults').classList.remove('hidden');sr$('srCoverage').textContent=`${d.sessions_analyzed} sessions · ${d.candles_analyzed} candles`;const summary=[['Sessions analyzed',d.sessions_analyzed],['Valid 5-minute candles',d.candles_analyzed],['Touches',Object.values(d.counts).reduce((a,x)=>a+x.touches,0)],['Confirmed reversals',Object.values(d.counts).reduce((a,x)=>a+x.confirmed_reversals,0)],['Potential reversals',Object.values(d.counts).reduce((a,x)=>a+x.potential_reversals,0)],['Breakouts',Object.values(d.counts).reduce((a,x)=>a+x.breakouts,0)],['Breakdowns',Object.values(d.counts).reduce((a,x)=>a+x.breakdowns,0)],['Fake breakouts',Object.values(d.counts).reduce((a,x)=>a+(x.failed_breakouts||0),0)],['Fake breakdowns',Object.values(d.counts).reduce((a,x)=>a+(x.failed_breakdowns||0),0)],['Actual date range',d.data_range.start&&d.data_range.end?`${d.data_range.start} → ${d.data_range.end}`:'No matching dates']];sr$('srSummaryCards').innerHTML=summary.map(([k,v])=>`<div class="metric"><small>${srEscape(k)}</small><strong>${srEscape(v)}</strong></div>`).join('');sr$('srDataNote').innerHTML=`<span class="source-dot"></span><div>${srEscape(d.data_note)}<br>Unmatched candle dates (no levels): ${d.unmatched_candle_dates.length}; level dates without candles: ${d.level_dates_without_candles.length}. Source files: ${srEscape(d.candle_source)}; ${srEscape(d.levels_source)}.</div>`;sr$('srStatsTable').querySelector('tbody').innerHTML=['S1','R1','S2','R2'].map(l=>{const c=d.counts[l];return `<tr><td><strong>${l}</strong></td><td>${c.touches}</td><td>${c.confirmed_reversals}</td><td>${c.potential_reversals}</td><td>${c.breakouts}</td><td>${c.breakdowns}</td><td>${c.failed_breakouts||0}</td><td>${c.failed_breakdowns||0}</td><td>${c.reversal_rate}%</td></tr>`}).join('');const max=Math.max(1,...['S1','R1','S2','R2'].map(l=>d.counts[l].touches));sr$('srLevelChart').innerHTML=['S1','R1','S2','R2'].map(l=>`<div class="metric"><small>${l} · ${l[0]==='S'?'Support':'Resistance'}</small><strong>${d.counts[l].touches} touches</strong><div class="sr-bar"><span style="width:${100*d.counts[l].touches/max}%"></span></div><div class="field-hint">${d.counts[l].confirmed_reversals} reversals · ${d.counts[l].breakouts+d.counts[l].breakdowns} confirmed breaks · ${d.counts[l].failed_breakouts||0} fake breakouts · ${d.counts[l].failed_breakdowns||0} fake breakdowns</div></div>`).join('');const monthly={};for(const e of (d.events||[])){const m=String(e.event_date||'').slice(0,7);if(!m)continue;monthly[m]=(monthly[m]||0)+1;}const monthRows=Object.entries(monthly).sort((a,b)=>a[0].localeCompare(b[0])).slice(-24);const monthMax=Math.max(1,...monthRows.map(x=>x[1]));sr$('srMonthlyChart').innerHTML=monthRows.length?monthRows.map(([m,n])=>`<div class="metric"><small>${srEscape(m)}</small><strong>${n} events</strong><div class="sr-bar"><span style="width:${100*n/monthMax}%"></span></div></div>`).join(''):'<div class="muted">No dated events available for monthly aggregation.</div>';sr$('srDownloadCsv').disabled=false;sr$('srDownloadXlsx').disabled=false;renderSrEvents();}
+sr$('srAutoEnd').value=new Date().toISOString().slice(0,10);{const d=new Date();d.setFullYear(d.getFullYear()-2);sr$('srAutoStart').value=d.toISOString().slice(0,10);}
+let nseDailyLevelRows=[];
+function renderNseDailyLevels(data){const rows=data.levels||[];nseDailyLevelRows=rows;sr$('srNseLevelsPanel').classList.remove('hidden');sr$('srNseLevelsMeta').textContent=`${rows.length} daily rows · requested ${sr$('srAutoStart').value} to ${sr$('srAutoEnd').value} · source: official NSE F&O bhavcopy`;sr$('srNseLevelsTable').querySelector('tbody').innerHTML=rows.map(r=>`<tr><td>${srEscape(r.date)}</td><td>${srEscape(r.level_source_date)}</td><td>${srEscape(r.expiry)}</td><td>${srEscape(fmt(r.atm_strike))}</td><td>${srEscape(fmt(r.ce_close))}</td><td>${srEscape(fmt(r.pe_close))}</td><td>${srEscape(fmt(r.S1))}</td><td>${srEscape(fmt(r.R1))}</td><td>${srEscape(fmt(r.S2))}</td><td>${srEscape(fmt(r.R2))}</td></tr>`).join('');sr$('srNseLevelsFoot').textContent=`Dates skipped: ${(data.skipped||[]).length}. These are the levels calculated for each target trading date from prior-session NSE options data. Intraday event statistics below are shown only when genuine five-minute candles were available and validated.`;if(spotChartCandles.length)spotDrawChart();}
+// Spot chart overlay: actual uploaded 5-minute candles plus the selected date's NSE-derived S1/S2/R1/R2.
+let spotChartCandles=[];
+function spotParseDate(value){const v=String(value||'').trim();let m=v.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return `${m[1]}-${m[2]}-${m[3]}`;m=v.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);if(m)return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;return '';}
+function spotParseCsv(text){const lines=text.replace(/^\uFEFF/,'').split(/\r?\n/).filter(x=>x.trim());if(lines.length<2)throw new Error('CSV has no candle rows.');const split=line=>{const out=[];let cur='',q=false;for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'&&line[i+1]==='"'&&q){cur+='"';i++;}else if(c==='"')q=!q;else if(c===','&&!q){out.push(cur.trim());cur='';}else cur+=c;}out.push(cur.trim());return out;};const head=split(lines[0]).map(x=>x.toLowerCase().replace(/[ _-]/g,''));const ix=(names)=>head.findIndex(h=>names.includes(h));const ti=ix(['timestamp','datetime','dateandtime','time','date']);const oi=ix(['open','o']),hi=ix(['high','h']),li=ix(['low','l']),ci=ix(['close','c','last']);if([ti,oi,hi,li,ci].some(x=>x<0))throw new Error('CSV must contain timestamp, open, high, low and close columns.');const rows=[];for(const line of lines.slice(1)){const a=split(line);const timestamp=(a[ti]||'').trim();const date=spotParseDate(timestamp);const vals=[oi,hi,li,ci].map(i=>Number(String(a[i]||'').replace(/,/g,'')));if(!date||vals.some(v=>!Number.isFinite(v)))continue;rows.push({date,timestamp,open:vals[0],high:vals[1],low:vals[2],close:vals[3]});}if(!rows.length)throw new Error('No valid OHLC candles were found in this CSV.');return rows.sort((a,b)=>a.timestamp.localeCompare(b.timestamp));}
+function spotDrawChart(){const canvas=sr$('niftySpotLevelsCanvas'),ctx=canvas.getContext('2d'),date=sr$('spotChartDate').value;const themeStyle=getComputedStyle(document.documentElement),chartGrid=themeStyle.getPropertyValue('--chart-grid').trim()||'#e1e7f0',chartLabel=themeStyle.getPropertyValue('--chart-label').trim()||'#697995',chartLine=themeStyle.getPropertyValue('--chart-line').trim()||'#3c66f5';const rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;canvas.width=Math.max(1,Math.floor(rect.width*dpr));canvas.height=Math.max(1,Math.floor(rect.height*dpr));ctx.scale(dpr,dpr);const W=rect.width,H=rect.height;ctx.clearRect(0,0,W,H);let candles=spotChartCandles.slice();const allDateCandles=candles;const windowSlider=sr$('spotChartWindow');const windowCount=windowSlider?Number(windowSlider.value||300):300;if(candles.length>windowCount)candles=candles.slice(-windowCount);if(windowSlider){windowSlider.max=String(Math.max(20,Math.ceil(allDateCandles.length/10)*10));windowSlider.min=String(Math.min(20,Math.max(1,allDateCandles.length)));windowSlider.disabled=allDateCandles.length===0;const label=sr$('spotChartWindowLabel');if(label)label.textContent=candles.length>=allDateCandles.length?'All '+allDateCandles.length+' candles':candles.length+' candles';}const overviewLevels=current&&current.support_resistance&&['S1','S2','R1','R2'].every(k=>current.support_resistance[k]!==null&&current.support_resistance[k]!==undefined&&current.support_resistance[k]!==''&&Number.isFinite(Number(current.support_resistance[k])))?current.support_resistance:null;const lev=overviewLevels||((nseDailyLevelRows||[]).find(r=>spotParseDate(r.date)===date));if(!candles.length){ctx.fillStyle=chartLabel;ctx.font='14px sans-serif';ctx.fillText('Load genuine five-minute candles for a date range to display the full range.',18,30);return;}if(!lev||['S1','S2','R1','R2'].some(k=>!Number.isFinite(Number(lev[k])))){ctx.fillStyle=chartLabel;ctx.font='14px sans-serif';ctx.fillText('No S1/S2/R1/R2 levels available. Fetch data in Data Session first.',18,30);return;}const series=candles.flatMap(c=>[c.low,c.high,c.close]).concat(['S1','S2','R1','R2'].map(k=>Number(lev[k])));let min=Math.min(...series),max=Math.max(...series);const pad=(max-min)*.08||10;min-=pad;max+=pad;const L=72,R=100,T=22,B=40,plotW=Math.max(20,W-L-R),plotH=Math.max(20,H-T-B);const x=i=>L+(candles.length<=1?0:i/(candles.length-1))*plotW;const y=v=>T+(max-v)/(max-min)*plotH;ctx.font='11px sans-serif';ctx.textAlign='right';ctx.textBaseline='middle';for(let i=0;i<=5;i++){const v=min+(max-min)*i/5,yy=y(v);ctx.strokeStyle=chartGrid;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(L,yy);ctx.lineTo(W-R+8,yy);ctx.stroke();ctx.fillStyle=chartLabel;ctx.fillText(v.toLocaleString('en-IN',{maximumFractionDigits:2}),L-8,yy);}const levels=[['S1',Number(lev.S1),'#d43b57'],['S2',Number(lev.S2),'#f08b45'],['R1',Number(lev.R1),'#07875b'],['R2',Number(lev.R2),'#087d87']];levels.forEach(([name,val,color])=>{const yy=y(val);ctx.save();ctx.strokeStyle=color;ctx.lineWidth=1.8;ctx.setLineDash(name==='S1'||name==='R1'?[]:[6,4]);ctx.beginPath();ctx.moveTo(L,yy);ctx.lineTo(W-R+8,yy);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=color;ctx.textAlign='left';ctx.font='bold 11px sans-serif';ctx.fillText(`${name} ${val.toLocaleString('en-IN',{maximumFractionDigits:2})}`,W-R+13,yy);ctx.restore();});/* Draw genuine OHLC candles; green for up candles, red for down candles. */const candleWidth=Math.max(2,Math.min(9,plotW/Math.max(1,candles.length)*0.62));candles.forEach((c,i)=>{const xx=x(i),up=Number(c.close)>=Number(c.open),color=up?'#07875b':'#d43b57';ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(xx,y(c.high));ctx.lineTo(xx,y(c.low));ctx.stroke();const top=Math.min(y(c.open),y(c.close)),bodyH=Math.max(1,Math.abs(y(c.open)-y(c.close)));ctx.fillRect(xx-candleWidth/2,top,candleWidth,bodyH);});ctx.fillStyle=chartLabel;ctx.textAlign='center';ctx.textBaseline='top';const labelCount=Math.min(6,candles.length);for(let i=0;i<labelCount;i++){const ix=Math.round(i*(candles.length-1)/Math.max(1,labelCount-1));const t=candles[ix].timestamp;ctx.fillText((t.length>=16?t.slice(5,10)+' '+t.slice(11,16):(t.slice(-5)||t.slice(11,16))),x(ix),H-B+8);}ctx.textAlign='left';ctx.fillStyle=chartLine;ctx.font='bold 12px sans-serif';ctx.fillText(`NIFTY 50 · ${candles[0].date} to ${candles[candles.length-1].date} · ${candles.length} candles shown`,L,T-7);}
+sr$('spotChartCandlesFile').addEventListener('change',async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{spotChartCandles=spotParseCsv(await f.text());const dates=[...new Set(spotChartCandles.map(c=>c.date))].sort();sr$('spotChartDate').innerHTML=dates.map(d=>`<option value="${d}">${d}</option>`).join('');sr$('spotChartDate').disabled=false;const hasOverviewLevels=!!(current&&current.support_resistance&&['S1','S2','R1','R2'].every(k=>current.support_resistance[k]!==null&&current.support_resistance[k]!==undefined&&current.support_resistance[k]!==''&&Number.isFinite(Number(current.support_resistance[k]))));const matching=hasOverviewLevels?dates:dates.filter(d=>(nseDailyLevelRows||[]).some(r=>spotParseDate(r.date)===d));if(matching.length)sr$('spotChartDate').value=matching[matching.length-1];sr$('spotChartStatus').textContent=`Loaded ${spotChartCandles.length} genuine candles across ${dates.length} trading dates from ${dates[0]} to ${dates[dates.length-1]}. Select a date with available NSE levels.`;spotDrawChart();}catch(err){spotChartCandles=[];sr$('spotChartStatus').textContent='Could not load spot candles: '+err.message;spotDrawChart();}});
+sr$('spotChartDate').addEventListener('change',spotDrawChart);sr$('spotChartWindow').addEventListener('input',spotDrawChart);
+function spotIsoToday(){const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}
+function initSpotChartDates(){const end=spotIsoToday(),from=new Date();from.setDate(from.getDate()-14);const start=[from.getFullYear(),String(from.getMonth()+1).padStart(2,'0'),String(from.getDate()).padStart(2,'0')].join('-');if(!sr$('spotChartFromDate').value)sr$('spotChartFromDate').value=start;if(!sr$('spotChartToDate').value)sr$('spotChartToDate').value=end}
+initSpotChartDates();
+sr$('loadSpotChart').addEventListener('click',async()=>{const start=sr$('spotChartFromDate').value,end=sr$('spotChartToDate').value,btn=sr$('loadSpotChart');if(!start||!end||end<start){sr$('spotChartStatus').textContent='Choose a valid From date and To date.';return}btn.disabled=true;btn.textContent='Loading…';sr$('spotChartStatus').textContent='Loading genuine five-minute NIFTY 50 candles for '+start+' to '+end+'…';try{const response=await fetch('/api/historical-sr/spot-candles?start_date='+encodeURIComponent(start)+'&end_date='+encodeURIComponent(end));const payload=await response.json();if(!response.ok)throw new Error(payload.detail||'Spot candle archive could not be loaded.');spotChartCandles=(payload.candles||[]).map(c=>({...c,date:c.date||String(c.timestamp||'').slice(0,10),timestamp:String(c.timestamp||'')}));const slider=sr$('spotChartWindow');if(slider){const total=spotChartCandles.length;slider.max=String(Math.max(1,total));slider.min=String(Math.min(20,Math.max(1,total)));slider.step='1';slider.value=String(Math.max(1,total));}const dates=[...new Set(spotChartCandles.map(c=>c.date).filter(Boolean))].sort();if(!dates.length)throw new Error('No valid candles were returned for this range.');sr$('spotChartDate').innerHTML=dates.map(d=>'<option value="'+d+'">'+d+'</option>').join('');sr$('spotChartDate').disabled=false;sr$('spotChartDate').value=dates[dates.length-1];sr$('spotChartStatus').textContent='Loaded '+(payload.count||spotChartCandles.length).toLocaleString()+' genuine five-minute candles across '+dates.length+' trading dates. Source: '+(payload.source||'configured spot archive')+'. Market Levels are overlaid when available.';spotDrawChart()}catch(err){spotChartCandles=[];sr$('spotChartDate').innerHTML='<option value="">No candles available</option>';sr$('spotChartDate').disabled=true;sr$('spotChartStatus').textContent=err.message;spotDrawChart()}finally{btn.disabled=false;btn.textContent='Load spot chart'}});
+themeToggle.addEventListener('click',()=>{if(spotChartCandles.length)requestAnimationFrame(spotDrawChart)});window.addEventListener('resize',()=>{if(spotChartCandles.length)spotDrawChart();});
+// Fixed-level analysis: use the exact Overview values across the full requested history.
+let fixedHistoricalResult=null;
+function refreshFixedLevelPreview(){
+ const sr=current&&current.support_resistance?current.support_resistance:null;
+ const valid=!!(sr&&['S1','S2','R1','R2'].every(k=>sr[k]!==null&&sr[k]!==undefined&&sr[k]!==''&&Number.isFinite(Number(sr[k]))));
+ for(const k of ['S1','S2','R1','R2'])sr$('fixed'+k).textContent=valid?fmt(sr[k]):'—';
+ sr$('fixedLevelSourceDate').textContent=valid?`Market Levels source date: ${current.trade_date||'loaded session'}`:'No Market Levels data loaded';
+ sr$('fixedAnalyzeBtn').disabled=false;
+ sr$('fixedAnalysisStatus').textContent=valid
+  ?`Ready to analyze fixed Market Levels: S1 ${fmt(sr.S1)}, S2 ${fmt(sr.S2)}, R1 ${fmt(sr.R1)}, R2 ${fmt(sr.R2)}. These exact values will be tested against every supplied five-minute candle in the selected range.`
+  :'Fetch data in Data Session first. The Overview tab must display numeric S1, S2, R1 and R2 before analysis can run.';
+}
+function setFixedDefaultDates(){
+ const end=new Date(),start=new Date(end);start.setFullYear(start.getFullYear()-2);
+ const localISO=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+ sr$('fixedToDate').value=localISO(end);sr$('fixedFromDate').value=localISO(start);
+}
+function renderFixedAnalysis(d){
+ fixedHistoricalResult=d;sr$('fixedAnalysisResults').classList.remove('hidden');
+ const range=d.requested_range||{};
+ sr$('fixedCoverageMeta').textContent=`${d.trading_dates} trading dates · ${Number(d.candles_analyzed).toLocaleString()} candles · requested ${range.start||'—'} to ${range.end||'—'} · actual ${d.data_range.start||'—'} to ${d.data_range.end||'—'} (IST)`;
+ const names=['S1','S2','R1','R2'];
+ sr$('fixedSummaryTable').querySelector('tbody').innerHTML=names.map(name=>{
+   const c=d.counts[name]||{};
+   return `<tr><td><strong>${name}</strong><br><span class="muted">${fmt(d.fixed_levels[name])}</span></td><td>${c.touches||0}</td><td>${c.reversal||0}</td><td>${Number(c.reversal_pct||0).toFixed(2)}%</td><td>${c.breakout||0}</td><td>${Number(c.breakout_pct||0).toFixed(2)}%</td><td>${c.breakdown||0}</td><td>${Number(c.breakdown_pct||0).toFixed(2)}%</td><td>${c.fake_breakout||0}</td><td>${Number(c.fake_breakout_pct||0).toFixed(2)}%</td><td>${c.fake_breakdown||0}</td><td>${Number(c.fake_breakdown_pct||0).toFixed(2)}%</td><td>${c.unresolved||0}</td></tr>`;
+ }).join('');
+ sr$('fixedSourceNote').innerHTML=`<span class="source-dot"></span><div>${srEscape(d.data_note)}<br><strong>Candle source:</strong> ${srEscape(d.candle_source||'Not reported')}<br>${srEscape(d.coverage_note||'')}</div>`;
+ renderFixedVisual();renderFixedEvents();sr$('fixedExportCsv').disabled=!(d.events&&d.events.length);
+}
+function renderFixedVisual(){
+ if(!fixedHistoricalResult)return;
+ const level=sr$('fixedVisualLevel').value||'S1';const c=fixedHistoricalResult.counts[level]||{};
+ const metrics=[['Reversal',Number(c.reversal_pct||0)],['Breakout',Number(c.breakout_pct||0)],['Breakdown',Number(c.breakdown_pct||0)],['Fake breakout',Number(c.fake_breakout_pct||0)],['Fake breakdown',Number(c.fake_breakdown_pct||0)]];
+ const max=Math.max(1,...metrics.map(x=>x[1]));const best=metrics.reduce((a,b)=>b[1]>a[1]?b:a,metrics[0]);
+ sr$('fixedVisualHeadline').textContent=`${level}: highest recorded reaction is ${best[0]} (${best[1].toFixed(2)}%). Based on ${c.touches||0} grouped touch interactions.`;
+ sr$('fixedVisualBars').innerHTML=metrics.map(([name,pct])=>`<div class="fixed-visual-row ${name===best[0]&&pct>0?'best':''}"><div class="fixed-visual-label">${name}</div><div class="fixed-visual-track"><div class="fixed-visual-fill" style="width:${Math.max(0,Math.min(100,pct))}%"></div></div><div class="fixed-visual-pct">${pct.toFixed(2)}%</div></div>`).join('');
+}
+sr$('fixedVisualLevel').addEventListener('change',renderFixedVisual);
+function getFilteredFixedEvents(){
+ if(!fixedHistoricalResult)return [];
+ const level=sr$('fixedFilterLevel').value,type=sr$('fixedFilterType').value;
+ return (fixedHistoricalResult.events||[]).filter(e=>(!level||e.level===level)&&(!type||e.event_type===type));
+}
+function renderFixedEvents(){
+ if(!fixedHistoricalResult)return;
+ const rows=getFilteredFixedEvents();
+ sr$('fixedEventCount').textContent=`${rows.length} interactions shown`;
+ sr$('fixedEventsTable').querySelector('tbody').innerHTML=rows.map(e=>`<tr><td>${srEscape(e.event_date)}</td><td>${srEscape(e.event_time)}</td><td><strong>${srEscape(e.level)}</strong></td><td>${Number(e.level_value).toLocaleString('en-IN',{maximumFractionDigits:2})}</td><td>${srEscape(e.event_type)}</td><td>${srEscape(e.approach_side)}</td><td>${e.spot_open}</td><td>${e.spot_high}</td><td>${e.spot_low}</td><td>${e.spot_close}</td><td>${srEscape(e.confirmation_datetime||'—')}</td><td>${e.result_points}</td><td>${srEscape(e.explanation)}</td></tr>`).join('');
+}
+setFixedDefaultDates();refreshFixedLevelPreview();
+sr$('fixedLevelAnalysisForm').addEventListener('submit',async ev=>{
+ ev.preventDefault();const btn=sr$('fixedAnalyzeBtn');const start=sr$('fixedFromDate').value,end=sr$('fixedToDate').value;
+ const sr=current&&current.support_resistance;
+ if(!sr||!['S1','S2','R1','R2'].every(k=>Number.isFinite(Number(sr[k])))){sr$('fixedAnalysisStatus').textContent='Cannot analyze: first fetch the required session in Data Session and confirm all four numeric S1/S2/R1/R2 values appear in Market Levels.';return;}
+ if(!start||!end){sr$('fixedAnalysisStatus').textContent='Select both From date and To date.';return;}
+ if(end<start){sr$('fixedAnalysisStatus').textContent='To date must be on or after From date.';return;}
+ if((new Date(end+'T00:00:00')-new Date(start+'T00:00:00'))/86400000>800){sr$('fixedAnalysisStatus').textContent='Select a maximum two-year range (800 calendar days or fewer).';return;}
+ btn.disabled=true;btn.textContent='Analyzing history…';sr$('fixedAnalysisResults').classList.add('hidden');
+ sr$('fixedAnalysisStatus').textContent='Validating five-minute NIFTY spot candles and testing the four fixed Market Levels. This may take a little time for a two-year file.';
+ const fd=new FormData();fd.append('start_date',start);fd.append('end_date',end);fd.append('s1',sr.S1);fd.append('s2',sr.S2);fd.append('r1',sr.R1);fd.append('r2',sr.R2);
+ fd.append('touch_tolerance',sr$('srTolerance').value);fd.append('reversal_points',sr$('srReversal').value);fd.append('confirmation_candles',sr$('srConfirmCandles').value);fd.append('failed_break_candles',sr$('srFailedCandles').value);fd.append('reset_points',sr$('srReset').value);
+ const file=sr$('spotChartCandlesFile').files&&sr$('spotChartCandlesFile').files[0];if(file)fd.append('candles_file',file,file.name);
+ async function requestJson(url,options={}){
+  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),30000);
+  try{const response=await fetch(url,{...options,signal:controller.signal});let payload;
+   try{payload=await response.json()}catch{throw new Error(`Server returned an unreadable response (HTTP ${response.status}). Check the RUN_LOCAL.bat window.`)}
+   if(!response.ok)throw new Error(payload.detail||`Request failed (HTTP ${response.status})`);return payload;
+  }finally{clearTimeout(timer)}
+ }
+ try{
+  const started=await requestJson('/api/historical-sr/fixed-level-analysis/start',{method:'POST',body:fd});
+  let data=null;
+  for(let attempt=0;attempt<1800;attempt++){
+   if(attempt>0)await new Promise(resolve=>setTimeout(resolve,900));
+   const status=await requestJson('/api/historical-sr/fixed-level-analysis/status/'+encodeURIComponent(started.job_id));
+   sr$('fixedAnalysisStatus').textContent=`${status.stage||'Analyzing'} · ${Number(status.progress||0)}%${status.candles_found?` · ${Number(status.candles_found).toLocaleString()} candles`:''}${status.trading_dates_found?` · ${status.trading_dates_found} trading dates`:''}. ${status.message||'Please wait.'}`;
+   if(status.status==='error')throw new Error(status.error||status.message||'Historical analysis failed.');
+   if(status.status==='complete'){data=status.result;break;}
+  }
+  if(!data)throw new Error('Analysis took longer than expected. Check the RUN_LOCAL.bat window and try again.');
+  renderFixedAnalysis(data);
+  sr$('fixedAnalysisStatus').textContent=`Analysis complete. Fixed Market Levels S1 ${fmt(sr.S1)}, S2 ${fmt(sr.S2)}, R1 ${fmt(sr.R1)}, R2 ${fmt(sr.R2)} tested against ${Number(data.candles_analyzed).toLocaleString()} genuine five-minute candles across ${data.trading_dates} trading dates. ${data.coverage_note||''}`;
+  sr$('fixedAnalysisResults').scrollIntoView({behavior:'smooth',block:'start'});if(spotChartCandles.length)spotDrawChart();
+ }catch(err){
+  const extra=err.name==='AbortError'?'The server did not respond within 30 seconds. Check the RUN_LOCAL.bat window.':err.message;
+  sr$('fixedAnalysisStatus').textContent='Automatic analysis could not complete: '+extra+' The app scans nse_5m_data (or NSE_5M_CSV_DIR) for genuine five-minute CSV files. NSE public daily reports do not contain five-minute candles; if no intraday archive is configured, a licensed NSE intraday data export or genuine CSV is required. No candle values were fabricated.';
+ }
+ finally{btn.disabled=false;btn.textContent='Analyze Market Levels';}
+});
+['fixedFilterLevel','fixedFilterType'].forEach(id=>sr$(id).addEventListener('change',renderFixedEvents));
+sr$('fixedExportCsv').addEventListener('click',()=>{
+ if(!fixedHistoricalResult)return;const rows=getFilteredFixedEvents();if(!rows.length)return;
+ const cols=Object.keys(rows[0]);const csv=[cols.join(','),...rows.map(r=>cols.map(c=>'"'+String(r[c]??'').replace(/"/g,'""')+'"').join(','))].join('\r\n');
+ const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='fixed_overview_levels_historical_events.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+
+sr$('srNseLevelsCsv').addEventListener('click',()=>{if(!nseDailyLevelRows.length)return;const cols=Object.keys(nseDailyLevelRows[0]);const csv=[cols.join(','),...nseDailyLevelRows.map(r=>cols.map(c=>'"'+String(r[c]??'').replace(/"/g,'""')+'"').join(','))].join('\r\n');const a=document.createElement('a');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.href=url;a.download='nse_daily_sr_levels.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
+sr$('historicalSrAutoForm').addEventListener('submit',async ev=>{
+ ev.preventDefault();
+ const btn=sr$('srAutoBtn'),start=sr$('srAutoStart').value,end=sr$('srAutoEnd').value;
+ if(!start||!end){sr$('srAutoStatus').textContent='Choose both From date and To date.';return;}
+ if(end<start){sr$('srAutoStatus').textContent='To date must be on or after From date.';return;}
+ btn.disabled=true;btn.textContent='Analyzing…';sr$('srHistoricalResults').classList.add('hidden');sr$('srNseLevelsPanel').classList.add('hidden');nseDailyLevelRows=[];sr$('srNseLevelsTable').querySelector('tbody').innerHTML='';if(spotChartCandles.length)spotDrawChart();
+ const selectedSpotFile=sr$('spotChartCandlesFile').files&&sr$('spotChartCandlesFile').files[0];
+ sr$('srAutoStatus').textContent='Starting analysis. First calculating each session’s levels from NSE option bhavcopies.'+(selectedSpotFile?' Then analyzing the genuine five-minute CSV you selected.':' Then checking the configured nse_5m_data folder for genuine five-minute candles.');
+ const fd=new FormData();fd.append('start_date',start);fd.append('end_date',end);
+ fd.append('touch_tolerance',sr$('srTolerance').value);fd.append('reversal_points',sr$('srReversal').value);
+ fd.append('confirmation_candles',sr$('srConfirmCandles').value);fd.append('failed_break_candles',sr$('srFailedCandles').value);fd.append('reset_points',sr$('srReset').value);if(selectedSpotFile)fd.append('candles_file',selectedSpotFile,selectedSpotFile.name);
+ async function requestJson(url,options={}){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),30000);try{const response=await fetch(url,{...options,signal:controller.signal});let payload;try{payload=await response.json()}catch{throw new Error(`Server returned unreadable response (HTTP ${response.status}). Check RUN_LOCAL.bat for errors.`)}if(!response.ok)throw new Error(payload.detail||`Request failed (HTTP ${response.status})`);return payload;}finally{clearTimeout(timer)}}
+ try{
+  const started=await requestJson('/api/historical-sr/analyze/start',{method:'POST',body:fd});
+  const jobId=started.job_id;let data=null;
+  for(let attempt=0;attempt<3600;attempt++){
+   await new Promise(resolve=>setTimeout(resolve,1200));
+   const status=await requestJson('/api/historical-sr/analyze/status/'+encodeURIComponent(jobId));
+   const done=Number(status.completed_sessions||0),total=Number(status.total_sessions||started.total_sessions||0),pct=total?Math.round(done*100/total):0;
+   sr$('srAutoStatus').textContent=`${status.stage||'Analyzing'} · ${pct}% · ${done}/${total} weekdays checked · ${status.rows_found||0} daily levels ready · ${status.dates_skipped||0} dates skipped${status.current_date?' · current date '+status.current_date:''}.`;
+   if(status.status==='error')throw new Error(status.error||'Historical analysis failed.');
+   if(status.status==='complete'){data=status;break;}
+  }
+  if(!data)throw new Error('Analysis took longer than expected and polling was stopped. Check the local server log; run Analyze again to resume using cached levels.');
+  const levelRows=data.levels||[];
+  if(levelRows.length){renderNseDailyLevels({levels:levelRows,skipped:data.skipped||[]});}
+  if(data.analysis_available&&data.analysis){
+   renderSrResult(data.analysis);
+   sr$('srAutoStatus').textContent=`Analysis complete for ${start} to ${end}: ${levelRows.length} daily levels; ${data.analysis.sessions_analyzed} sessions and ${data.analysis.candles_analyzed} genuine five-minute candles analyzed. Summary and dated events are displayed below.`;
+   sr$('srHistoricalResults').scrollIntoView({behavior:'smooth',block:'start'});
+  }else{
+   sr$('srAutoStatus').textContent=`Daily levels ready: ${levelRows.length} dates calculated for ${start} to ${end}. The S1/S2/R1/R2 table is displayed below, but reversal/breakout statistics were not calculated. ${data.analysis_error||'Genuine five-minute candles are unavailable for this range.'} Upload a genuine five-minute OHLC CSV in the NIFTY spot chart panel before clicking Analyze, or place CSV files in nse_5m_data. The optional Manual CSV fallback is also available. No fake values were added.`;
+   sr$('srNseLevelsPanel').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+ }catch(err){sr$('srAutoStatus').textContent='Analysis could not finish: '+(err.name==='AbortError'?'The server did not respond within 30 seconds. Check the local server window and try again.':err.message)+' Results already calculated may be cached; no historical prices were invented.';}
+ finally{btn.disabled=false;btn.textContent='Analyze selected date range';}
+});
+sr$('historicalSrForm').addEventListener('submit',async ev=>{ev.preventDefault();const btn=sr$('srAnalyzeBtn');btn.disabled=true;sr$('srStatus').textContent='Validating uploaded CSVs and analyzing actual candles…';const fd=new FormData();fd.append('candles_file',sr$('srCandlesFile').files[0]);fd.append('levels_file',sr$('srLevelsFile').files[0]);fd.append('touch_tolerance',sr$('srTolerance').value);fd.append('reversal_points',sr$('srReversal').value);fd.append('confirmation_candles',sr$('srConfirmCandles').value);fd.append('failed_break_candles',sr$('srFailedCandles').value);fd.append('reset_points',sr$('srReset').value);try{const res=await fetch('/api/historical-sr/analyze',{method:'POST',body:fd});const data=await res.json();if(!res.ok)throw new Error(data.detail||'Analysis failed');renderSrResult(data);sr$('srStatus').textContent=`Analysis complete. Actual matching coverage: ${data.data_range.start||'none'} to ${data.data_range.end||'none'} (IST).`; }catch(err){sr$('srStatus').textContent='Could not analyze files: '+err.message;}finally{btn.disabled=false;}});
+['srFilterLevel','srFilterType','srFilterFrom','srFilterTo'].forEach(id=>sr$(id).addEventListener('change',()=>{srPage=1;renderSrEvents()}));sr$('srPrevPage').onclick=()=>{srPage--;renderSrEvents()};sr$('srNextPage').onclick=()=>{srPage++;renderSrEvents()};
+sr$('srDownloadCsv').onclick=()=>{if(!historicalSrResult)return;const rows=filteredSrEvents();const cols=Object.keys(rows[0]||{});const csv=[cols.join(','),...rows.map(r=>cols.map(c=>'"'+String(r[c]??'').replace(/"/g,'""')+'"').join(','))].join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='historical_sr_events.csv';a.click();URL.revokeObjectURL(a.href)};
+sr$('srDownloadXlsx').onclick=async()=>{if(!historicalSrResult)return;try{const summary=Object.entries(historicalSrResult.counts).map(([level,c])=>({level,...c}));const res=await fetch('/api/historical-sr/export.xlsx',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({events:filteredSrEvents(),summary})});if(!res.ok)throw new Error('Excel export failed');const blob=await res.blob(),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='historical_sr_analysis.xlsx';a.click();URL.revokeObjectURL(url)}catch(e){sr$('srStatus').textContent=e.message}};
+
+</script></body></html>

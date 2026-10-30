@@ -1,0 +1,78 @@
+NIFTY LAB — PREMIUM TRADING RESEARCH TERMINAL
+============================================
+
+LOCAL RUN (Windows)
+1. Extract this ZIP fully into a normal folder.
+2. Install Python 3.12 x64 and Node.js 22 LTS (includes npm).
+3. Double-click RUN_LOCAL.bat; it builds the React terminal UI on first launch.
+4. Keep its command window open and visit http://127.0.0.1:8000.
+5. Choose the NIFTY 50 historical date and exact expiry, then click Fetch data. This app supports NIFTY 50 only.
+
+DATA
+- Automatic NSE historical archive retrieval, with the NSE historical contract API as a fallback.
+- Expiry detection recognizes UDiFF IDO and legacy OPTIDX instrument codes.
+- If NSE retrieval is blocked or unavailable, upload a compatible historical NSE CSV/ZIP. The app does not silently substitute another date or expiry.
+
+SEPARATE RESULT SECTIONS
+- Session summary and source details.
+- Support & Resistance cards with each formula and numeric substitution.
+- HLC ATM contract details: CE and PE Open, High, Low, Close side by side, plus the absolute CE/PE Close difference.
+- Break-Even Premium (BEP) analysis: ATM CE Close, ATM PE Close, ATM BEP, coverage count, and a BEP calculation row for every selected strike.
+- Full selected strike contract matrix with filter/sort, CSV export and Excel export.
+
+CALCULATION RULES
+- HLC ATM strike: the available strike with the minimum absolute |CE Close - PE Close| across paired CE/PE contracts for the selected trading date and expiry. Ties prefer the strike closest to the NIFTY close, then the lower strike.
+- BEP for each strike = (CE Close + PE Close) / 2, only when both closing prices are available.
+- S1 = ATM Strike - HLC ATM PE Close.
+- R1 = ATM Strike + HLC ATM CE Close.
+- S2 = ATM Strike - (HLC ATM CE Close + HLC ATM PE Close).
+- R2 = ATM Strike + (HLC ATM CE Close + HLC ATM PE Close).
+- “HLC ATM” names the selected strike. The four support/resistance formulas use the CE/PE closing prices directly, not (High + Low + Close) / 3.
+
+CLOUD ACCESS
+See DEPLOY_TO_RENDER.md. After deployment, the public URL can be opened on mobile or another device without keeping your PC running. A free host may sleep after inactivity.
+
+HISTORICAL S&R ANALYSIS — NSE-ONLY MODE
+- No Kite credentials are required.
+- In the Historical S&R tab, choose From date and To date, then click the single “Analyze selected date range” button.
+- The workflow calculates each target day's S1/S2/R1/R2 from the previous available official NSE F&O bhavcopy using the existing HLC ATM and support/resistance formula engine. It displays a date-wise levels table including source date, expiry, ATM strike, CE/PE close, S1, R1, S2 and R2.
+- If genuine five-minute candles are present, the same Analyze action also calculates touch, confirmed/potential reversal, breakout, breakdown, fake-breakout and fake-breakdown counts plus a dated event log.
+- Public NSE daily reports/bhavcopies do not provide this app with a verified free two-year five-minute spot API. For automatic event analysis, place genuine five-minute NIFTY OHLC CSV exports from an authorized NSE intraday data service in nse_5m_data (or configure NSE_5M_CSV_DIR in .env). Do not place daily bars here.
+- If intraday files are unavailable, the daily levels table still displays when NSE option history was retrieved, and the page explains why event statistics were not run. Use the optional Manual CSV fallback for real five-minute candles. The app never fabricates candles.
+
+CHECKS
+Run: python -m pytest -q
+Automated tests cover data parsing, date filtering, existing calculations and mocked sources; they do not guarantee that NSE will serve every historical date/expiry. Verify source labels and retrieved values before using them for trading.
+
+
+SPOT CHART LEVEL OVERLAY
+------------------------
+In Historical S&R Analysis, run Analyze for a date range, then upload a genuine 5-minute NIFTY spot OHLC CSV in the Spot price with S1, S2, R1 and R2 chart panel. Select a trading date to see the actual close-price trace and that date's four horizontal levels. Public NSE daily bhavcopy data does not itself supply the 5-minute spot candles; use a valid authorized source export. The chart never fabricates missing candles or levels.
+
+
+HISTORICAL S&R WORKFLOW — FIXED OVERVIEW LEVELS
+------------------------------------------------
+1. Fetch your current option session in Data Session and confirm S1/S2/R1/R2 in Overview.
+2. Open Historical S&R Analysis and choose From date / To date (default: the previous two years).
+3. Click “Analyze Overview levels” once. The app automatically scans nse_5m_data (or NSE_5M_CSV_DIR in .env) for the selected range, validates genuine five-minute OHLC bars, and compares them with the same four fixed Overview prices.
+4. Section A displays counts and percentages for reversal, breakout, breakdown, fake breakout and fake breakdown per level.
+5. Section B lists each event's date, time, price level, OHLC values and confirmation details. Export the event rows to CSV.
+
+ONE-TIME DATA SETUP REQUIRED FOR AUTOMATIC INTRADAY ANALYSIS
+-------------------------------------------------------------
+NSE public historical index reports and F&O bhavcopies are daily/EOD data; the app has no verified free official NSE endpoint for two years of five-minute spot candles. Obtain genuine five-minute NIFTY 50 OHLC files through an authorized NSE intraday data service and place CSVs or ZIPs containing CSVs in nse_5m_data. After this one-time setup, the web page automatically loads/filter the available archive by the selected date range; you do not need to upload the same file on each run. If no valid intraday archive exists, the app shows a clear error and never fabricates candles or event counts.
+
+The four Overview levels are treated as fixed prices across the entire selected range. The app does not recalculate different S1/S2/R1/R2 values for past dates.
+
+FREE AUTOMATIC FIVE-MINUTE SOURCE
+---------------------------------
+If nse_5m_data contains no local CSV/ZIP files, the analyzer attempts to fetch public NIFTY 1-minute OHLC CSV files from https://github.com/technovusin/nifty50-historical-data and resamples them to five-minute bars. Files are cached in data_cache/public_nifty_1min so repeat analyses do not download them again. Internet access is required on the first fetch.
+
+This is a community-maintained dataset, not an official NSE feed. The repository documents missing bars and other known data quirks. The app shows the source in results; verify data quality before relying on trading conclusions. It never fills missing candles with fabricated prices. If GitHub is unavailable, a clear fetch error is shown.
+
+
+PREMIUM FRONTEND
+- React + TypeScript + Vite frontend shell; Tailwind CSS tokens; shadcn/ui-style button and Radix tooltip; Lucide React icons.
+- TradingView Lightweight Charts displays validated five-minute OHLC candles and existing S1/S2/R1/R2 levels when real chart data is available. Otherwise the original chart remains as a fallback.
+- Original calculations, data source workflows, CSV/Excel export and print handling remain in the protected existing feature workspace.
+- Run BUILD_FRONTEND.bat to build the React app separately. Node.js 22 LTS and npm are required.

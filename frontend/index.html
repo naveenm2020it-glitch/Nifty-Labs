@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f6f8fb" />
+    <meta name="description" content="NIFTY LAB — source-aware historical options analysis and trading research terminal." />
+    <title>NIFTY LAB · Trading Research Terminal</title>
+    <script>
+      try {
+        const saved = localStorage.getItem('nifty-dashboard-theme') || 'light';
+        document.documentElement.dataset.theme = saved;
+      } catch (_) { document.documentElement.dataset.theme = 'light'; }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
