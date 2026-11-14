@@ -17,7 +17,7 @@ from app.auto_history import automated_analysis
 from app.data import (
     fetch_official_bhavcopy, parse_bhavcopy_bytes, filter_session, select_strikes,
     get_underlying_close, build_dashboard_rows, support_resistance,
-    fetch_nifty_close_api, fetch_contract_api
+    fetch_nifty_close_api, fetch_contract_api, fetch_nifty_day_range_api
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -200,6 +200,14 @@ def home():
     # Development fallback keeps the existing application runnable before
     # frontend dependencies have been installed and built.
     return LEGACY_HTML_PATH.read_text(encoding="utf-8")
+
+@app.get("/api/nifty/day-range")
+def nifty_day_range():
+    """Return the current NSE NIFTY 50 session high/low and Mangesh distance."""
+    try:
+        return fetch_nifty_day_range_api()
+    except Exception as exc:
+        raise HTTPException(502, f"Could not fetch today's NIFTY 50 high/low from NSE: {type(exc).__name__}: {exc}") from exc
 
 @app.get("/api/health")
 def health():
