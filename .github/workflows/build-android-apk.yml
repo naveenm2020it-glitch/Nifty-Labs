@@ -33,6 +33,47 @@ jobs:
           npm install
           npm run build
 
+      - name: Smoke-test bundled FastAPI routes and original calculations
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install backend smoke-test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "fastapi>=0.115,<1.0" "uvicorn>=0.30,<1.0" "pandas>=2.2,<3.0" "requests>=2.32,<3.0" "python-multipart>=0.0.9" "openpyxl>=3.1" "httpx>=0.27,<1.0"
+
+      - name: Verify local API, UI assets and unchanged level formulas
+        env:
+          NIFTYLAB_PROJECT_ROOT: ${{ github.workspace }}
+          CACHE_DB: ${{ runner.temp }}/nifty-standalone-smoke.sqlite3
+        run: |
+          python - <<'PY'
+          import pandas as pd
+          from fastapi.testclient import TestClient
+          from app.main import app
+          from app.data import select_strikes, support_resistance
+
+          client = TestClient(app)
+          assert client.get("/api/health").status_code == 200
+          assert client.get("/").status_code == 200
+          assert client.get("/workspace").status_code == 200
+          assert client.get("/assets/legacy-chart-bridge.js").status_code == 200
+
+          levels = support_resistance(25000, 100, 80)
+          assert levels == {"S1": 24920.0, "R1": 25100.0, "S2": 24820.0, "R2": 25180.0}, levels
+
+          rows = pd.DataFrame([
+              {"strike": 25000, "option_type": "CE", "close": 100},
+              {"strike": 25000, "option_type": "PE", "close": 98},
+              {"strike": 25050, "option_type": "CE", "close": 50},
+              {"strike": 25050, "option_type": "PE", "close": 49},
+          ])
+          _, atm = select_strikes(rows, 25000, 50, 1, 1)
+          assert atm == 25050.0, atm
+          print("PASS: local API, React assets, legacy workspace, HLC ATM and S/R formula checks.")
+          PY
+
       - name: Set up Python for Chaquopy build
         uses: actions/setup-python@v5
         with:
