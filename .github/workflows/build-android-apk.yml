@@ -33,6 +33,11 @@ jobs:
           npm install
           npm run build
 
+      - name: Set up Python for Chaquopy build
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
