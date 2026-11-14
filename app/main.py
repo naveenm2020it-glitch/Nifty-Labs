@@ -20,7 +20,7 @@ from app.data import (
     fetch_nifty_close_api, fetch_contract_api, fetch_nifty_day_range_api
 )
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(os.getenv("NIFTYLAB_PROJECT_ROOT", str(Path(__file__).resolve().parent.parent))).resolve()
 LEGACY_HTML_PATH = PROJECT_ROOT / "static" / "index.html"
 FRONTEND_DIST = PROJECT_ROOT / "frontend" / "dist"
 
