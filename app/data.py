@@ -175,6 +175,37 @@ def _records_from_json(payload):
                     return found
     return []
 
+
+def fetch_nifty_day_range_api(timeout: int = 20) -> dict:
+    """Fetch today's NIFTY 50 high/low from NSE's public all-indices quote endpoint."""
+    session = _api_session(timeout)
+    response = session.get("https://www.nseindia.com/api/allIndices", timeout=timeout)
+    response.raise_for_status()
+    records = _records_from_json(response.json())
+    for rec in records:
+        if not isinstance(rec, dict):
+            continue
+        normalized = {str(k).lower().replace("_", "").replace(" ", ""): v for k, v in rec.items()}
+        name = str(normalized.get("index", normalized.get("indexname", ""))).strip().upper()
+        if name != "NIFTY 50":
+            continue
+        high = next((normalized[k] for k in ("high", "dayhigh", "indexhigh") if normalized.get(k) not in (None, "", "-")), None)
+        low = next((normalized[k] for k in ("low", "daylow", "indexlow") if normalized.get(k) not in (None, "", "-")), None)
+        try:
+            high_value, low_value = float(str(high).replace(",", "")), float(str(low).replace(",", ""))
+        except (TypeError, ValueError):
+            continue
+        if high_value <= 0 or low_value <= 0 or high_value < low_value:
+            continue
+        return {
+            "index": "NIFTY 50", "high": high_value, "low": low_value,
+            "distance": (high_value - low_value) * 0.2611,
+            "as_of": normalized.get("timestamp", normalized.get("time", "")),
+            "source": "NSE public all-indices quote API",
+            "formula": "(Today's NIFTY High - Today's NIFTY Low) × 26.11%",
+        }
+    raise RuntimeError("NSE public all-indices API did not return valid NIFTY 50 day-high/day-low values.")
+
 def fetch_nifty_close_api(trade_date: date, symbol: str = "NIFTY", timeout: int = 20) -> tuple[float, str]:
     """Best-effort NSE historical index API lookup for the NIFTY 50 close."""
     if symbol.upper() != "NIFTY":
