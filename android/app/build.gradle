@@ -40,7 +40,7 @@ chaquopy {
         pip {
             install("fastapi>=0.115,<1.0")
             install("uvicorn>=0.30,<1.0")
-            install("pandas>=2.2,<3.0")
+            install("pandas==2.1.3")
             install("requests>=2.32,<3.0")
             install("python-multipart>=0.0.9")
             install("openpyxl>=3.1")
