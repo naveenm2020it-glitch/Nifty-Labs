@@ -33,7 +33,11 @@ public class MainActivity extends Activity {
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(Color.rgb(239, 235, 243));
+        root.setBackgroundColor(Color.rgb(241, 244, 252));
+        int statusBarHeight = 0;
+        int statusId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (statusId > 0) statusBarHeight = getResources().getDimensionPixelSize(statusId);
+        root.setPadding(0, statusBarHeight, 0, 0);
 
         progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
         progressBar.setMax(100);
@@ -85,6 +89,7 @@ public class MainActivity extends Activity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 view.evaluateJavascript(MOBILE_THEME, null);
+                view.evaluateJavascript(OUTER_THEME, null);
             }
         });
 
