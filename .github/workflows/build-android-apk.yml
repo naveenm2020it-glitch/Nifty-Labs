@@ -50,6 +50,11 @@ jobs:
 
           client = TestClient(app)
           assert client.get("/api/health").status_code == 200
+          workspace = client.get("/workspace")
+          assert workspace.status_code == 200
+          assert '/static/mobile-ui.css' in workspace.text
+          assert '#dataNotice { display: none' not in workspace.text
+          assert client.get("/static/mobile-ui.css").status_code == 200
 
           levels = support_resistance(25000, 100, 80)
           assert levels == {"S1": 24920.0, "R1": 25100.0, "S2": 24820.0, "R2": 25180.0}, levels
@@ -62,8 +67,14 @@ jobs:
           ])
           _, atm = select_strikes(rows, 25000, 50, 1, 1)
           assert atm == 25050.0, atm
-          print("PASS: local API, React assets, legacy workspace, HLC ATM and S/R formula checks.")
+          print("PASS: API, responsive React build, reference-styled workspace assets, HLC ATM and S/R formula checks.")
           PY
+
+      - name: Build and type-check responsive web application
+        working-directory: frontend
+        run: |
+          npm install --no-audit --no-fund
+          npm run build
 
       - name: Set up Python for Chaquopy build
         uses: actions/setup-python@v5
