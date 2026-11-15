@@ -41,22 +41,22 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setStatusBarColor(Color.rgb(244, 242, 251));
-        getWindow().setNavigationBarColor(Color.rgb(244, 242, 251));
+        getWindow().setStatusBarColor(Color.rgb(248, 248, 248));
+        getWindow().setNavigationBarColor(Color.rgb(248, 248, 248));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(Color.rgb(244, 242, 251));
+        root.setBackgroundColor(Color.rgb(248, 248, 248));
 
         progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
         progressBar.setMax(100);
-        progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(Color.rgb(126, 97, 190)));
+        progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(Color.rgb(110, 110, 110)));
         root.addView(progressBar, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(3)));
 
         startupMessage = new TextView(this);
         startupMessage.setText("Preparing NIFTY LAB local engine…");
-        startupMessage.setTextColor(Color.rgb(63, 52, 91));
+        startupMessage.setTextColor(Color.rgb(55, 55, 55));
         startupMessage.setTextSize(15);
         startupMessage.setGravity(android.view.Gravity.CENTER);
         startupMessage.setPadding(dp(24), dp(24), dp(24), dp(24));
@@ -138,12 +138,23 @@ public class MainActivity extends Activity {
                 handler.post(() -> {
                     startupMessage.setVisibility(View.GONE);
                     webView.setVisibility(View.VISIBLE);
-                    webView.loadUrl(LOCAL_URL);
+                    webView.loadDataWithBaseURL(LOCAL_URL, readAssetText("engine-only.html"), "text/html", "UTF-8", null);
                 });
             } catch (Throwable error) {
                 showStartupError("NIFTY LAB setup failed: " + error.getMessage());
             }
         }, "niftylab-bootstrap").start();
+    }
+
+
+    private String readAssetText(String name) throws Exception {
+        try (InputStream in = getAssets().open(name);
+             java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream()) {
+            byte[] buffer = new byte[4096];
+            int count;
+            while ((count = in.read(buffer)) != -1) out.write(buffer, 0, count);
+            return out.toString("UTF-8");
+        }
     }
 
     private boolean isLocalServerReady() {
