@@ -28,7 +28,7 @@ export default function App() {
       const nav=doc.querySelector<HTMLButtonElement>(`button[data-page-target="${page}"]`);
       if(nav && !nav.classList.contains('active')) nav.click();
       const win=frame.contentWindow;
-      if(win){win.dispatchEvent(new Event('resize'));win.scrollTo({top:0,behavior:'auto'});}
+      if(win){const resizeEvent=doc.createEvent('Event');resizeEvent.initEvent('resize',true,false);win.dispatchEvent(resizeEvent);win.scrollTo({top:0,behavior:'auto'});}
     }catch{/* The iframe will retry navigation after it finishes loading. */}
   },[]);
 
