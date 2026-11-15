@@ -89,13 +89,28 @@ jobs:
       - name: Install Android platform
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Bundle backend engine only (no legacy frontend)
+      - name: Bundle original NIFTY LAB content and Android-only navigation skin
         run: |
           mkdir -p android/app/src/main/python/app
           cp app/*.py android/app/src/main/python/app/
           mkdir -p android/app/src/main/assets/niftylab_root/static
+          cp static/index.html android/app/src/main/assets/niftylab_root/static/index.html
+          cp android/mobile-ui.css android/app/src/main/assets/niftylab_root/static/mobile-ui.css
+          cp android/mobile-ui.js android/app/src/main/assets/niftylab_root/static/mobile-ui.js
+          python - <<'PY'
+          from pathlib import Path
+          page = Path("android/app/src/main/assets/niftylab_root/static/index.html")
+          html = page.read_text(encoding="utf-8")
+          html = html.replace("</head>", '<link rel="stylesheet" href="/static/mobile-ui.css"></head>', 1)
+          html = html.replace("</body>", '<script src="/static/mobile-ui.js"></script></body>', 1)
+          page.write_text(html, encoding="utf-8")
+          assert 'href="/static/mobile-ui.css"' in html
+          assert 'src="/static/mobile-ui.js"' in html
+          PY
           test -f android/app/src/main/python/app/main.py
-          test -f android/app/src/main/assets/engine-only.html
+          test -f android/app/src/main/assets/niftylab_root/static/index.html
+          test -f android/app/src/main/assets/niftylab_root/static/mobile-ui.css
+          test -f android/app/src/main/assets/niftylab_root/static/mobile-ui.js
 
       - name: Build standalone debug APK with embedded Python and Pandas
         working-directory: android
@@ -106,10 +121,11 @@ jobs:
           APK=android/app/build/outputs/apk/debug/app-debug.apk
           test -s "$APK"
           unzip -l "$APK" | grep -q 'lib/arm64-v8a/libpython3.13.so'
-          unzip -l "$APK" | grep -q 'assets/engine-only.html'
-          if unzip -l "$APK" | grep -Eq 'assets/niftylab_root/(static/index.html|frontend/dist/index.html)'; then echo 'Legacy frontend unexpectedly bundled'; exit 1; fi
+          unzip -l "$APK" | grep -q 'assets/niftylab_root/static/index.html'
+          unzip -l "$APK" | grep -q 'assets/niftylab_root/static/mobile-ui.css'
+          unzip -l "$APK" | grep -q 'assets/niftylab_root/static/mobile-ui.js'
           unzip -l "$APK" | grep -q 'assets/chaquopy'
-          echo "Standalone APK contains embedded Python backend and engine-only shell; legacy frontend excluded."
+          echo "Standalone APK contains the complete original NIFTY LAB workspace, embedded Python engine and Android-only glass bottom navigation."
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
