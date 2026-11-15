@@ -186,6 +186,8 @@ window.addEventListener('message', function (event) {
     const nav = document.querySelector('button[data-page-target="' + message.page.replace(/[^a-z-]/g, '') + '"]');
     if (nav && !nav.classList.contains('active')) nav.click();
   }
+  window.dispatchEvent(new Event('resize'));
+  window.scrollTo({ top: 0, behavior: 'auto' });
 });
 window.__niftyLabGetSpotChartState = function () {
   const selectedDate = sr$('spotChartDate')?.value || '';
