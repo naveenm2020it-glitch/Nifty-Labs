@@ -41,13 +41,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setStatusBarColor(Color.rgb(248, 248, 248));
-        getWindow().setNavigationBarColor(Color.rgb(248, 248, 248));
+        getWindow().setStatusBarColor(Color.rgb(245, 243, 237));
+        getWindow().setNavigationBarColor(Color.rgb(245, 243, 237));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(Color.rgb(248, 248, 248));
+        root.setBackgroundColor(Color.rgb(245, 243, 237));
 
         progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
         progressBar.setMax(100);
@@ -56,14 +56,14 @@ public class MainActivity extends Activity {
 
         startupMessage = new TextView(this);
         startupMessage.setText("Preparing NIFTY LAB local engine…");
-        startupMessage.setTextColor(Color.rgb(55, 55, 55));
+        startupMessage.setTextColor(Color.rgb(32, 41, 37));
         startupMessage.setTextSize(15);
         startupMessage.setGravity(android.view.Gravity.CENTER);
         startupMessage.setPadding(dp(24), dp(24), dp(24), dp(24));
         root.addView(startupMessage, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
 
         webView = new WebView(this);
-        webView.setBackgroundColor(Color.rgb(244, 242, 251));
+        webView.setBackgroundColor(Color.rgb(245, 243, 237));
         webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         webView.setVisibility(View.GONE);
         webView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
@@ -138,7 +138,7 @@ public class MainActivity extends Activity {
                 handler.post(() -> {
                     startupMessage.setVisibility(View.GONE);
                     webView.setVisibility(View.VISIBLE);
-                    webView.loadDataWithBaseURL(LOCAL_URL, readAssetText("engine-only.html"), "text/html", "UTF-8", null);
+                    webView.loadUrl(LOCAL_URL);
                 });
             } catch (Throwable error) {
                 showStartupError("NIFTY LAB setup failed: " + error.getMessage());
