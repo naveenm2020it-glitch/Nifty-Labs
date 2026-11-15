@@ -138,7 +138,7 @@ public class MainActivity extends Activity {
                 handler.post(() -> {
                     startupMessage.setVisibility(View.GONE);
                     webView.setVisibility(View.VISIBLE);
-                    webView.loadUrl("file:///android_asset/engine-only.html");
+                    webView.loadUrl(LOCAL_URL);
                 });
             } catch (Throwable error) {
                 showStartupError("NIFTY LAB setup failed: " + error.getMessage());
