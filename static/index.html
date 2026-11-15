@@ -217,6 +217,76 @@ details summary{color:var(--app-text)}details[open] summary{margin-bottom:6px}
 #spotChartWindow{width:100%;accent-color:var(--app-accent-strong);cursor:ew-resize}
 #spotChartWindowLabel{float:right;color:var(--app-accent-strong);font-weight:800}
 
+
+/* Premium mobile research workspace: keep all existing IDs and JS contracts intact. */
+:root,html[data-theme="light"]{
+ --app-bg:#f7f8f4;--surface:#fffefa;--surface-2:#f1f3ec;--surface-3:#e9ede2;
+ --app-line:#e1e5da;--app-text:#1d241f;--app-muted:#69736b;--app-subtle:#929a91;
+ --app-accent:#71834f;--app-accent-strong:#5c6e3d;--app-accent-soft:#edf1e4;
+ --app-teal:#397d82;--app-teal-soft:#e9f2ef;--app-violet:#71834f;--app-violet-soft:#edf1e4;
+ --app-green:#287b59;--app-green-soft:#e8f4ec;--app-red:#b84c48;--app-red-soft:#faece9;
+ --app-amber:#98702e;--app-amber-soft:#f7f0df;--app-shadow:0 6px 22px rgba(29,43,30,.045);
+ --app-shadow-raised:0 14px 34px rgba(29,43,30,.075);--focus-ring:rgba(113,131,79,.22);
+ --chart-grid:#e7eadf;--chart-label:#788076;--chart-line:#71834f;
+}
+html[data-theme="dark"]{
+ --app-bg:#111613;--surface:#1a211c;--surface-2:#222b24;--surface-3:#2b352c;
+ --app-line:#354137;--app-text:#edf1e9;--app-muted:#aab5a9;--app-subtle:#828f82;
+ --app-accent:#b2c58b;--app-accent-strong:#c3d69b;--app-accent-soft:#303d29;
+ --app-teal:#83c4b9;--app-teal-soft:#203630;--app-violet:#b2c58b;--app-violet-soft:#303d29;
+ --app-green:#82d1a3;--app-green-soft:#20382b;--app-red:#f29b8d;--app-red-soft:#3d2927;
+ --app-amber:#e3c17e;--app-amber-soft:#3b3323;--app-shadow:0 8px 26px rgba(0,0,0,.2);
+ --app-shadow-raised:0 16px 40px rgba(0,0,0,.28);--focus-ring:rgba(178,197,139,.25);
+ --chart-grid:#344036;--chart-label:#aab5a9;--chart-line:#b2c58b;
+}
+html,body{background:var(--app-bg)!important;color:var(--app-text)!important;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif!important;letter-spacing:-.012em}
+body{padding-bottom:env(safe-area-inset-bottom);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit!important}
+button{touch-action:manipulation}
+.sidebar{position:sticky!important;top:0!important;z-index:80!important;display:flex!important;gap:clamp(10px,2vw,28px)!important;padding:8px clamp(12px,3vw,34px)!important;background:color-mix(in srgb,var(--surface) 94%,transparent)!important;border-bottom:1px solid var(--app-line)!important;box-shadow:0 3px 20px rgba(25,35,25,.035)!important;backdrop-filter:blur(22px) saturate(1.35)!important;-webkit-backdrop-filter:blur(22px) saturate(1.35)!important}
+.side-brand{gap:10px!important}
+.side-logo{border:1px solid var(--app-line)!important;border-radius:12px!important;background:var(--surface)!important;box-shadow:0 2px 8px rgba(20,30,20,.04)!important}
+.side-logo span{background:var(--app-accent)!important}
+.side-logo span:nth-child(2),.side-logo span:nth-child(3),.side-logo span:nth-child(4){background:var(--app-accent)!important;opacity:.78}
+.side-brand strong{font-size:13px!important;letter-spacing:.01em!important}
+.side-brand small{font-size:9px!important;letter-spacing:.1em!important}
+.side-nav{gap:clamp(5px,1.3vw,18px)!important}
+.nav-item{min-height:48px!important;padding:7px 4px!important;font-size:11px!important;font-weight:680!important;color:var(--app-muted)!important;border-bottom:2px solid transparent!important;transition:color 150ms ease,border-color 150ms ease!important}
+.nav-item.active{color:var(--app-accent-strong)!important;border-bottom-color:var(--app-accent)!important}
+.nav-item:hover{color:var(--app-text)!important;transform:none!important;box-shadow:none!important}
+.nav-icon{font-size:14px!important}
+main,.main-content,.content,.page-content{color:var(--app-text)}
+h1,h2,h3,h4{letter-spacing:-.035em}
+.card,.panel,.section-card,.metric-card,.stat-card,.form-card,.table-card,.chart-card,.content-card,[class*="card"]{border-color:var(--app-line)!important;box-shadow:var(--app-shadow)!important}
+.card,.panel,.section-card,.metric-card,.stat-card,.form-card,.table-card,.chart-card,.content-card{border-radius:16px!important;background:var(--surface)!important}
+input,select,textarea{min-height:40px;border:1px solid var(--app-line)!important;border-radius:10px!important;background:var(--surface)!important;color:var(--app-text)!important;box-shadow:none!important}
+input:focus,select:focus,textarea:focus{border-color:var(--app-accent)!important;box-shadow:0 0 0 3px var(--focus-ring)!important;outline:0!important}
+button,.btn{border-radius:10px!important;transition:background-color 150ms ease,color 150ms ease,border-color 150ms ease,transform 120ms ease,box-shadow 150ms ease!important}
+button:active,.btn:active{transform:scale(.98)!important}
+button:disabled,.btn:disabled{transform:none!important}
+table{border-collapse:separate!important;border-spacing:0!important}
+th{background:var(--surface-2)!important;color:var(--app-muted)!important;font-size:10px!important;font-weight:750!important;letter-spacing:.045em!important;text-transform:uppercase}
+td,th{border-color:var(--app-line)!important}
+tr:hover td{background:color-mix(in srgb,var(--app-accent-soft) 45%,var(--surface))!important}
+hr{border-color:var(--app-line)!important}
+.badge,.pill,.chip{border-radius:999px!important}
+a{color:var(--app-accent-strong)}
+:focus-visible{outline:2px solid var(--app-accent)!important;outline-offset:3px!important}
+@media(max-width:760px){
+ .sidebar{position:sticky!important;display:flex!important;flex-wrap:wrap!important;gap:5px 10px!important;padding:7px 10px!important}
+ .side-brand{min-width:0!important;flex:1 0 100%!important}
+ .side-logo{width:32px!important;height:32px!important}
+ .side-nav{justify-content:flex-start!important;flex:1 1 100%!important;overflow-x:auto!important;scrollbar-width:none!important;gap:13px!important}
+ .side-nav::-webkit-scrollbar{display:none}
+ .nav-item{min-height:39px!important;flex:0 0 auto!important;gap:5px!important;font-size:10px!important}
+ .nav-label{font-size:10px!important}
+ .nav-icon{font-size:13px!important}
+ .card,.panel,.section-card,.metric-card,.stat-card,.form-card,.table-card,.chart-card,.content-card{border-radius:13px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
 </style>
 
 <style id="nifty-v3-polish">
