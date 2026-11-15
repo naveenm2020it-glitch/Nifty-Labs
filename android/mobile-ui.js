@@ -1,0 +1,8 @@
+(()=>{const defs=[
+ ['session','Data','M4 7h10M18 7h2M4 17h2m4 0h10M14 4v6M8 14v6'],
+ ['overview','Levels','M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z'],
+ ['contracts','Contracts','M3 4h18v16H3zM3 9h18M9 9v11'],
+ ['analytics','BEP','M5 3h14v18H5zM9 7h6M9 11h1m4 0h1M9 15h1m4 0h1'],
+ ['historical-sr','History','M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5m4-1v5l3 2'],
+ ['guide','Guide','M12 3a9 9 0 1 0 0 18a9 9 0 0 0 0-18M12 11v5m0-8h.01']
+];function init(){if(document.querySelector('.app-mobile-dock'))return;const dock=document.createElement('nav');dock.className='app-mobile-dock';dock.setAttribute('aria-label','NIFTY LAB sections');defs.forEach(([key,label,path])=>{const b=document.createElement('button');b.type='button';b.dataset.target=key;b.innerHTML='<span class="dock-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+path+'"/></svg></span><span>'+label+'</span>';b.addEventListener('click',()=>{const old=document.querySelector('.nav-item[data-page-target="'+key+'"]');if(old)old.click();sync();});dock.appendChild(b)});document.body.appendChild(dock);function sync(){const current=(location.hash||'#session').slice(1);dock.querySelectorAll('button').forEach(b=>{const on=b.dataset.target===current;b.classList.toggle('active',on);b.setAttribute('aria-current',on?'page':'false')})}window.addEventListener('hashchange',sync);document.addEventListener('click',e=>{if(e.target.closest('.nav-item[data-page-target]'))setTimeout(sync,0)},true);new MutationObserver(sync).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});sync();}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();})();
