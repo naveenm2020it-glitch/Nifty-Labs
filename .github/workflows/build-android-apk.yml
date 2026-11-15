@@ -27,12 +27,6 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Build complete NIFTY LAB web UI
-        working-directory: frontend
-        run: |
-          npm install
-          npm run build
-
       - name: Smoke-test bundled FastAPI routes and original calculations
         uses: actions/setup-python@v5
         with:
@@ -56,9 +50,6 @@ jobs:
 
           client = TestClient(app)
           assert client.get("/api/health").status_code == 200
-          assert client.get("/").status_code == 200
-          assert client.get("/workspace").status_code == 200
-          assert client.get("/assets/legacy-chart-bridge.js").status_code == 200
 
           levels = support_resistance(25000, 100, 80)
           assert levels == {"S1": 24920.0, "R1": 25100.0, "S2": 24820.0, "R2": 25180.0}, levels
@@ -98,17 +89,13 @@ jobs:
       - name: Install Android platform
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Bundle original Python engine and UI assets
+      - name: Bundle backend engine only (no legacy frontend)
         run: |
           mkdir -p android/app/src/main/python/app
           cp app/*.py android/app/src/main/python/app/
           mkdir -p android/app/src/main/assets/niftylab_root/static
-          cp -R static/. android/app/src/main/assets/niftylab_root/static/
-          mkdir -p android/app/src/main/assets/niftylab_root/frontend/dist
-          cp -R frontend/dist/. android/app/src/main/assets/niftylab_root/frontend/dist/
           test -f android/app/src/main/python/app/main.py
-          test -f android/app/src/main/assets/niftylab_root/static/index.html
-          test -f android/app/src/main/assets/niftylab_root/frontend/dist/index.html
+          test -f android/app/src/main/assets/engine-only.html
 
       - name: Build standalone debug APK with embedded Python and Pandas
         working-directory: android
@@ -119,10 +106,10 @@ jobs:
           APK=android/app/build/outputs/apk/debug/app-debug.apk
           test -s "$APK"
           unzip -l "$APK" | grep -q 'lib/arm64-v8a/libpython3.13.so'
-          unzip -l "$APK" | grep -q 'assets/niftylab_root/static/index.html'
-          unzip -l "$APK" | grep -q 'assets/niftylab_root/frontend/dist/index.html'
+          unzip -l "$APK" | grep -q 'assets/engine-only.html'
+          if unzip -l "$APK" | grep -Eq 'assets/niftylab_root/(static/index.html|frontend/dist/index.html)'; then echo 'Legacy frontend unexpectedly bundled'; exit 1; fi
           unzip -l "$APK" | grep -q 'assets/chaquopy'
-          echo "Standalone APK contains embedded Python, bundled UI and backend assets."
+          echo "Standalone APK contains embedded Python backend and engine-only shell; legacy frontend excluded."
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
