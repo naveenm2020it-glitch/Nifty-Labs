@@ -80,8 +80,11 @@ export default function App() {
     const frame = iframeRef.current;
     if (!frame?.contentWindow) return;
     try {
-      // The APK hosts its React shell locally and the feature workspace on the
-      // existing Render origin. Cross-origin DOM access is intentionally avoided.
+      // Hash navigation is explicitly allowed across origins and the legacy
+      // workspace already maps its hash to the existing page router.
+      frame.contentWindow.location.hash = page;
+      // Theme synchronization uses the small, origin-checked bridge added to
+      // the backend. If the deployed backend is older, the shell remains usable.
       frame.contentWindow.postMessage({ type: 'nifty-lab:sync', page, theme: nextTheme }, API_BASE_URL || window.location.origin);
       setFrameError(false);
     } catch {
