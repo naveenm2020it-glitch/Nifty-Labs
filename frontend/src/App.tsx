@@ -29,7 +29,7 @@ type ApiStatus = 'checking' | 'online' | 'offline';
 
 // Set VITE_API_BASE_URL when building the Android package. Browser/Render builds
 // leave it empty and retain the original same-origin behavior.
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\\/+$/, '');
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
 
 const NAV_ITEMS: Array<{
   key: PageKey;
