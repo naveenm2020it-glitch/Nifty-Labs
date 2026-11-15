@@ -81,17 +81,8 @@ export default function App() {
     if (!frame?.contentWindow) return;
     try {
       // The APK hosts its React shell locally and the feature workspace on the
-      // existing Render origin, so use a message bridge rather than DOM access.
+      // existing Render origin. Cross-origin DOM access is intentionally avoided.
       frame.contentWindow.postMessage({ type: 'nifty-lab:sync', page, theme: nextTheme }, API_BASE_URL || window.location.origin);
-      const frameWindow = frame.contentWindow;
-      if (frameWindow) {
-        // Re-run the original chart resize/theme listener so custom charts keep
-        // their existing dimensions and colour tokens after a theme change.
-        const resizeEvent = frameWindow.document.createEvent('Event');
-        resizeEvent.initEvent('resize', true, false);
-        frameWindow.dispatchEvent(resizeEvent);
-        frameWindow.scrollTo({ top: 0, behavior: 'auto' });
-      }
       setFrameError(false);
     } catch {
       setFrameError(true);
