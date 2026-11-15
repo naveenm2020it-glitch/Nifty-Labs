@@ -198,3 +198,15 @@ canvas,svg,img{max-width:100%}
 .reference-dock-item:hover:not(.active){color:#55515f!important;background:rgba(255,255,255,.38)!important}
 @media(max-width:390px){.reference-bottom-dock{width:calc(100vw - 16px)!important;min-height:68px!important;padding:5px 4px!important;border-radius:27px!important}.reference-dock-item{min-height:56px!important;gap:3px!important}.reference-dock-icon{width:30px!important;height:30px!important}.reference-dock-label{font-size:9px!important}}
 @media(min-width:900px){.reference-bottom-dock{bottom:18px!important;min-height:72px!important;width:min(580px,calc(100vw - 48px))!important}.reference-dock-item{min-height:56px!important}}
+
+/* Keep the same light reference palette even if an old dark-mode preference exists. */
+html[data-theme="dark"]{
+ color-scheme:light!important;
+ --app-bg:#f1f3f8!important;--surface:rgba(255,255,255,.82)!important;--surface-2:rgba(255,255,255,.68)!important;--surface-3:#fff!important;
+ --app-line:rgba(208,211,224,.62)!important;--app-text:#252530!important;--app-muted:#777783!important;--app-subtle:#9999a4!important;
+ --app-accent:#7563e9!important;--app-accent-strong:#6353d1!important;--app-accent-soft:rgba(120,103,232,.13)!important;
+ --app-teal:#7fc8c2!important;--app-teal-soft:rgba(127,200,194,.17)!important;--app-violet:#a69ae4!important;--app-violet-soft:rgba(166,154,228,.15)!important;
+ --app-green:#258b6c!important;--app-green-soft:rgba(37,139,108,.12)!important;--app-red:#c65c68!important;--app-red-soft:rgba(198,92,104,.12)!important;
+ --app-amber:#d58e37!important;--app-amber-soft:rgba(213,142,55,.15)!important;
+ --app-shadow:0 10px 28px rgba(69,66,92,.07)!important;--app-shadow-raised:0 18px 44px rgba(69,66,92,.13)!important;
+}
