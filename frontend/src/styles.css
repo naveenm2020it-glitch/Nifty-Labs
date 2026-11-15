@@ -1,35 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-:root{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
-*{box-sizing:border-box}
-html,body,#root{width:100%;min-width:320px;height:100%;min-height:100%;margin:0}
-body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-.nifty-shell{--shell-bg:#f5f3ed;--shell-ink:#1e2524;--shell-muted:#7b8580;--shell-line:rgba(40,57,50,.09);--dock-bg:rgba(255,255,252,.88);--dock-shadow:0 18px 48px rgba(32,44,37,.13);display:flex;flex-direction:column;width:100%;height:100dvh;min-height:480px;overflow:hidden;background:var(--shell-bg);color:var(--shell-ink);transition:background-color .22s ease,color .22s ease}
-.nifty-shell.dark{--shell-bg:#111715;--shell-ink:#eef3ef;--shell-muted:#89958e;--shell-line:rgba(231,241,235,.1);--dock-bg:rgba(28,37,33,.9);--dock-shadow:0 18px 48px rgba(0,0,0,.34);color-scheme:dark}
-.nifty-topbar{position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:70px;padding:10px clamp(16px,4vw,30px);border-bottom:1px solid var(--shell-line);background:var(--shell-bg)}
-.nifty-brand{display:flex;align-items:center;gap:11px;min-width:0}
-.nifty-brand-mark{display:grid;place-items:center;width:38px;height:38px;border:1px solid rgba(177,142,79,.25);border-radius:13px;background:linear-gradient(145deg,#e7d7b4,#c4d5c8);color:#23372e;box-shadow:0 5px 13px rgba(71,89,73,.12)}
-.nifty-brand-copy{display:flex;flex-direction:column;gap:3px}
-.nifty-brand-copy strong{font-size:14px;letter-spacing:.09em;font-weight:850}
-.nifty-brand-copy small{font-size:8px;letter-spacing:.16em;font-weight:750;color:var(--shell-muted)}
-.nifty-top-actions{display:flex;align-items:center;gap:11px}
-.nifty-engine-status{display:flex;align-items:center;gap:6px;color:var(--shell-muted);font-size:10px;font-weight:700;white-space:nowrap}
-.nifty-engine-status.online{color:#368568}.nifty-engine-status.offline{color:#c66a62}.nifty-engine-status.checking svg{animation:nifty-spin 1.3s linear infinite}
-.nifty-theme-toggle{display:grid;place-items:center;width:39px;height:39px;border:1px solid var(--shell-line);border-radius:14px;background:var(--dock-bg);color:var(--shell-ink);box-shadow:0 4px 13px rgba(35,49,41,.06);cursor:pointer;transition:transform .16s ease,background-color .18s ease}
-.nifty-theme-toggle:active{transform:scale(.94)}
-.nifty-workspace{position:relative;display:flex;flex:1;min-height:0;width:100%;overflow:hidden}
-.workspace-frame{display:block;flex:1;width:100%;height:100%;min-height:0;border:0;background:transparent}
-.nifty-bottom-dock{position:fixed;z-index:9999;left:50%;bottom:calc(12px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min( min(95vw,680px),calc(100vw - 20px));min-height:72px;padding:6px 8px;display:flex;align-items:center;justify-content:space-around;gap:3px;border:1px solid var(--shell-line);border-radius:26px;background:var(--dock-bg);box-shadow:var(--dock-shadow),inset 0 1px 0 rgba(255,255,255,.65);backdrop-filter:blur(24px) saturate(1.25);-webkit-backdrop-filter:blur(24px) saturate(1.25)}
-.nifty-dock-item{display:flex;flex:1 1 0;min-width:0;min-height:58px;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:4px 2px;border:0;border-radius:19px;background:transparent;color:var(--shell-muted);cursor:pointer;transition:transform .15s ease,background-color .18s ease,color .18s ease}
-.nifty-dock-item:active{transform:scale(.95)}
-.nifty-dock-icon{display:grid;place-items:center;width:33px;height:32px;border-radius:12px;transition:background-color .18s ease,color .18s ease}
-.nifty-dock-label{font-size:9px;font-weight:750;line-height:1.1;white-space:nowrap}
-.nifty-dock-item.active{color:var(--shell-ink);background:rgba(169,185,163,.2)}
-.nifty-dock-item.active .nifty-dock-icon{background:linear-gradient(145deg,#d7c49b,#a8c3b2);color:#1c3027;box-shadow:0 5px 12px rgba(107,132,111,.18)}
-.nifty-shell.dark .nifty-dock-item.active{background:rgba(171,194,174,.12)}
-.nifty-shell.dark .nifty-dock-item.active .nifty-dock-icon{background:linear-gradient(145deg,#cbb98f,#789987);color:#15221c}
-@keyframes nifty-spin{to{transform:rotate(360deg)}}
-@media(max-width:390px){.nifty-topbar{min-height:64px;padding-inline:13px}.nifty-engine-status span{display:none}.nifty-bottom-dock{width:calc(100vw - 12px);min-height:67px;padding:5px 3px;border-radius:23px}.nifty-dock-item{min-height:55px;gap:3px}.nifty-dock-icon{width:29px;height:29px}.nifty-dock-label{font-size:8px}}
-@media(min-width:900px){.nifty-topbar{min-height:74px;padding-inline:max(28px,calc((100vw - 1120px)/2))}.nifty-bottom-dock{bottom:16px;width:min(610px,calc(100vw - 48px))}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+:root {
+  color-scheme: light;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  width: 100%;
+  min-width: 320px;
+  height: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body { background: #fff; }
+
+.nifty-blank-canvas {
+  width: 100%;
+  min-height: 100dvh;
+  background: #fff;
+}
