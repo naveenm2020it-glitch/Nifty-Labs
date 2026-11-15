@@ -38,8 +38,6 @@ public class MainActivity extends Activity {
     private TextView startupMessage;
     private final Handler handler = new Handler(Looper.getMainLooper());
 
-    private static final String MOBILE_UI = new String(android.util.Base64.decode("KGZ1bmN0aW9uKCl7ZnVuY3Rpb24gYXBwbHkoKXt0cnl7ZG9jdW1lbnQuZG9jdW1lbnRFbGVtZW50LmRhdGFzZXQudGhlbWU9J2xpZ2h0Jztkb2N1bWVudC5ib2R5LnN0eWxlLm92ZXJmbG93WD0naGlkZGVuJzt2YXIgaW50cm89ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2JyYW5kSW50cm8nKTtpZihpbnRybylpbnRyby5yZW1vdmUoKTt2YXIgcm9vdD1kb2N1bWVudC5xdWVyeVNlbGVjdG9yKCcuYXBwLXNoZWxsJyk7aWYocm9vdClyb290LnN0eWxlLnZpc2liaWxpdHk9J3Zpc2libGUnO31jYXRjaChlKXt9fWlmKGRvY3VtZW50LnJlYWR5U3RhdGU9PT0nbG9hZGluZycpZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsYXBwbHkpO2Vsc2UgYXBwbHkoKTtzZXRUaW1lb3V0KGFwcGx5LDI1MCk7c2V0VGltZW91dChhcHBseSwxMDAwKX0pKCk7", android.util.Base64.DEFAULT), java.nio.charset.StandardCharsets.UTF_8);
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,8 +95,6 @@ public class MainActivity extends Activity {
             }
             @Override
             public void onPageFinished(WebView view, String url) {
-                view.evaluateJavascript("try{sessionStorage.setItem('nifty-lab-intro-seen','1');var x=document.querySelector('.intro-skip');if(x)x.click()}catch(e){}", null);
-                view.evaluateJavascript(MOBILE_UI, null);
                 progressBar.setVisibility(View.GONE);
             }
             @Override
@@ -142,7 +138,7 @@ public class MainActivity extends Activity {
                 handler.post(() -> {
                     startupMessage.setVisibility(View.GONE);
                     webView.setVisibility(View.VISIBLE);
-                    webView.loadUrl(LOCAL_URL);
+                    webView.loadUrl("file:///android_asset/engine-only.html");
                 });
             } catch (Throwable error) {
                 showStartupError("NIFTY LAB setup failed: " + error.getMessage());
