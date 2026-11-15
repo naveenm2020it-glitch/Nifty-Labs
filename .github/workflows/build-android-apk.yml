@@ -30,7 +30,7 @@ jobs:
       - name: Install and build the Android React interface
         working-directory: frontend
         run: |
-          npm ci
+          npm install
           npm run build
 
       - name: Smoke-test bundled FastAPI routes and original calculations
