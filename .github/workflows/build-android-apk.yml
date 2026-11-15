@@ -1,0 +1,68 @@
+name: Build NIFTY LAB Android APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_base_url:
+        description: "Existing NIFTY LAB Render backend URL (https://...)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out redesign branch
+        uses: actions/checkout@v4
+        with:
+          ref: apple-premium-ui-redesign
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Validate backend URL
+        shell: bash
+        run: |
+          if [[ ! "${{ inputs.api_base_url }}" =~ ^https:// ]]; then
+            echo "The backend URL must begin with https://"
+            exit 1
+          fi
+
+      - name: Install frontend packages
+        working-directory: frontend
+        run: npm install --no-audit --no-fund
+
+      - name: Build bundled UI for the supplied backend
+        working-directory: frontend
+        env:
+          VITE_API_BASE_URL: ${{ inputs.api_base_url }}
+        run: npm run build
+
+      - name: Generate Android project and sync bundled UI
+        working-directory: frontend
+        run: |
+          npx cap add android
+          npx cap sync android
+
+      - name: Build installable debug APK
+        working-directory: frontend/android
+        run: ./gradlew --no-daemon assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nifty-lab-android-debug-apk
+          path: frontend/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
