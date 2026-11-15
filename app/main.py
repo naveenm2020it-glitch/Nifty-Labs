@@ -160,15 +160,15 @@ def legacy_workspace():
     """
     html = LEGACY_HTML_PATH.read_text(encoding="utf-8")
     embedded_styles = r"""
+<link rel="stylesheet" href="/static/mobile-ui.css">
 <style id="nifty-lab-embedded-overrides">
   html, body { min-width: 0 !important; width: 100% !important; min-height: 100% !important; }
-  body { overflow-x: hidden !important; background: var(--app-bg) !important; }
-  body > .app-shell > .sidebar, .app-main > .app-topbar, .app-main > .top, #dataNotice { display: none !important; }
+  body { overflow-x: hidden !important; }
+  body > .app-shell > .sidebar, .app-main > .app-topbar, .app-main > .top { display: none !important; }
   .app-shell { min-height: 100vh !important; width: 100% !important; }
-  .app-main { width: 100% !important; max-width: none !important; min-width: 0 !important; margin: 0 auto !important; padding: clamp(12px, 2.2vw, 26px) clamp(10px, 2vw, 24px) 34px !important; }
+  .app-main { width: 100% !important; max-width: 1040px !important; min-width: 0 !important; margin: 0 auto !important; }
   .page-intro { margin-top: 0 !important; }
   .page-view { min-width: 0 !important; }
-  @media (max-width: 600px) { .app-main { padding: 13px 9px 24px !important; } }
 </style>
 """
     chart_bridge = r"""
