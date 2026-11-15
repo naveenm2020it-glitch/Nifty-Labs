@@ -171,3 +171,30 @@ canvas,svg,img{max-width:100%}
  .bep-strike-dialog{width:min(720px,calc(100vw - 64px))!important}
  .bep-strike-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
+
+/* Shared floating bottom dock: six original NIFTY LAB destinations. */
+.reference-bottom-dock{
+ position:fixed!important;z-index:9999!important;left:50%!important;bottom:calc(12px + env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;
+ width:min( min(94vw,650px),calc(100vw - 24px))!important;min-height:76px!important;padding:7px 9px!important;
+ display:flex!important;align-items:center!important;justify-content:space-around!important;gap:3px!important;
+ border:1px solid rgba(255,255,255,.9)!important;border-radius:31px!important;
+ background:rgba(255,255,255,.78)!important;
+ box-shadow:0 18px 44px rgba(61,53,78,.16),inset 0 1px 0 rgba(255,255,255,.96)!important;
+ backdrop-filter:blur(26px) saturate(1.3)!important;-webkit-backdrop-filter:blur(26px) saturate(1.3)!important
+}
+.reference-dock-item{
+ position:relative!important;display:flex!important;flex:1 1 0!important;min-width:0!important;min-height:60px!important;
+ flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important;
+ padding:4px 2px!important;border:0!important;border-radius:22px!important;background:transparent!important;
+ color:#898792!important;cursor:pointer!important;box-shadow:none!important;
+ transition:transform .2s cubic-bezier(.2,.8,.2,1),background .2s,color .2s,box-shadow .2s!important
+}
+.reference-dock-item:active{transform:scale(.94)!important}
+.reference-dock-icon{display:grid!important;place-items:center!important;width:34px!important;height:34px!important;border-radius:50%!important;transition:all .22s!important}
+.reference-dock-icon svg{width:21px!important;height:21px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+.reference-dock-label{font-size:10px!important;font-weight:700!important;line-height:1.1!important;white-space:nowrap!important;color:inherit!important}
+.reference-dock-item.active{color:#24232c!important;background:rgba(255,255,255,.92)!important;box-shadow:0 6px 17px rgba(62,54,79,.1),inset 0 1px 0 #fff!important}
+.reference-dock-item.active .reference-dock-icon{color:#fff!important;background:linear-gradient(145deg,#ffc879,#f4a34c)!important;box-shadow:0 6px 14px rgba(239,158,70,.3)!important}
+.reference-dock-item:hover:not(.active){color:#55515f!important;background:rgba(255,255,255,.38)!important}
+@media(max-width:390px){.reference-bottom-dock{width:calc(100vw - 16px)!important;min-height:68px!important;padding:5px 4px!important;border-radius:27px!important}.reference-dock-item{min-height:56px!important;gap:3px!important}.reference-dock-icon{width:30px!important;height:30px!important}.reference-dock-label{font-size:9px!important}}
+@media(min-width:900px){.reference-bottom-dock{bottom:18px!important;min-height:72px!important;width:min(580px,calc(100vw - 48px))!important}.reference-dock-item{min-height:56px!important}}
