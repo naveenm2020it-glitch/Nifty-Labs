@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>NIFTY LAB Engine</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#fff;color:#171717;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{padding:28px 22px;max-width:640px;margin:0 auto}
+h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-.04em}
+p{margin:8px 0;color:#666;font-size:13px}
+hr{border:0;border-top:1px solid #eee;margin:24px 0}
+.status{display:flex;align-items:center;gap:9px;margin-top:24px;font-size:13px}
+.dot{width:9px;height:9px;border-radius:50%;background:#aaa}
+.dot.ok{background:#229b68}.dot.bad{background:#c64b4b}
+small{display:block;margin-top:6px;color:#888;font-size:11px}
+</style>
+</head>
+<body>
+<main>
+<h1>NIFTY LAB</h1>
+<p>Standalone calculation engine</p>
+<hr>
+<div class="status"><span id="dot" class="dot"></span><strong id="state">Checking local engine…</strong></div>
+<small id="detail">Checking the embedded API service.</small>
+</main>
+<script>
+(async function(){
+ const state=document.getElementById('state'),dot=document.getElementById('dot'),detail=document.getElementById('detail');
+ try{
+  const r=await fetch('http://127.0.0.1:8765/api/health',{cache:'no-store'});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const j=await r.json();
+  if(j.status!=='ok')throw new Error('Unexpected health response');
+  state.textContent='Calculation engine running';dot.className='dot ok';
+  detail.textContent='Local API is ready. Existing NIFTY LAB calculations and data services are retained.';
+ }catch(e){state.textContent='Engine unavailable';dot.className='dot bad';detail.textContent='Local API check failed: '+(e&&e.message?e.message:'unknown error');}
+})();
+</script>
+</body>
+</html>
