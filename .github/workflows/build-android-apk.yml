@@ -27,6 +27,12 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install and build the Android React interface
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
       - name: Smoke-test bundled FastAPI routes and original calculations
         uses: actions/setup-python@v5
         with:
@@ -94,29 +100,33 @@ jobs:
       - name: Install Android platform
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Bundle calculation engine only (no frontend UI)
+      - name: Bundle complete standalone application (frontend + engine)
         run: |
           mkdir -p android/app/src/main/python/app
           cp app/*.py android/app/src/main/python/app/
-          mkdir -p android/app/src/main/assets/niftylab_root/static
+          mkdir -p android/app/src/main/assets/niftylab_root/static android/app/src/main/assets/niftylab_root/frontend
+          cp static/index.html android/app/src/main/assets/niftylab_root/static/index.html
+          cp static/mobile-ui.css android/app/src/main/assets/niftylab_root/static/mobile-ui.css
+          cp -R frontend/dist android/app/src/main/assets/niftylab_root/frontend/dist
           test -f android/app/src/main/python/app/main.py
-          test -f android/app/src/main/assets/engine-only.html
+          test -f android/app/src/main/assets/niftylab_root/static/index.html
+          test -f android/app/src/main/assets/niftylab_root/frontend/dist/index.html
+          test -f android/app/src/main/assets/niftylab_root/frontend/dist/assets/legacy-chart-bridge.js
 
       - name: Build standalone debug APK with embedded Python and Pandas
         working-directory: android
         run: gradle --no-daemon assembleDebug
 
-      - name: Verify standalone APK contains engine and no old frontend UI
+      - name: Verify standalone APK contains complete UI and embedded engine
         run: |
           APK=android/app/build/outputs/apk/debug/app-debug.apk
           test -s "$APK"
           unzip -l "$APK" | grep -q 'lib/arm64-v8a/libpython3.13.so'
-          unzip -l "$APK" | grep -q 'assets/engine-only.html'
+          unzip -l "$APK" | grep -q 'assets/niftylab_root/static/index.html'
+          unzip -l "$APK" | grep -q 'assets/niftylab_root/static/mobile-ui.css'
+          unzip -l "$APK" | grep -q 'assets/niftylab_root/frontend/dist/index.html'
           unzip -l "$APK" | grep -q 'assets/chaquopy'
-          if unzip -l "$APK" | grep -Eq 'assets/niftylab_root/static/(index.html|mobile-ui.css|mobile-ui.js)'; then
-            echo "Unexpected frontend UI assets found in APK"; exit 1
-          fi
-          echo "Standalone APK contains the embedded calculation engine and neutral engine shell only; previous frontend UI assets are excluded."
+          echo "PASS: APK includes the React shell, original feature workspace, mobile theme, chart bridge and embedded Python engine."
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
