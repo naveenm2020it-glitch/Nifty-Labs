@@ -33,8 +33,10 @@ jobs:
 
       - name: Validate backend URL
         shell: bash
+        env:
+          API_BASE_URL: ${{ inputs.api_base_url }}
         run: |
-          if [[ ! "${{ inputs.api_base_url }}" =~ ^https:// ]]; then
+          if [[ "$API_BASE_URL" != https://* ]]; then
             echo "The backend URL must begin with https://"
             exit 1
           fi
