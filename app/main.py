@@ -174,7 +174,9 @@ def legacy_workspace():
     chart_bridge = r"""
 <script>
 window.addEventListener('message', function (event) {
-  if (event.origin !== window.location.origin) return;
+  if (event.source !== window.parent) return;
+  const trustedParentOrigins = [window.location.origin, 'capacitor://localhost', 'http://localhost', 'https://localhost'];
+  if (!trustedParentOrigins.includes(event.origin)) return;
   const message = event.data;
   if (!message || message.type !== 'nifty-lab:sync') return;
   if (message.theme === 'light' || message.theme === 'dark') {
