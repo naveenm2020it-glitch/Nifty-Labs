@@ -27,6 +27,10 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 type PageKey = 'session' | 'overview' | 'contracts' | 'analytics' | 'historical-sr' | 'guide';
 type ApiStatus = 'checking' | 'online' | 'offline';
 
+// Set VITE_API_BASE_URL when building the Android package. Browser/Render builds
+// leave it empty and retain the original same-origin behavior.
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
+
 const NAV_ITEMS: Array<{
   key: PageKey;
   label: string;
@@ -74,21 +78,14 @@ export default function App() {
 
   const syncWorkspace = useCallback((page: PageKey, nextTheme: 'light' | 'dark') => {
     const frame = iframeRef.current;
-    const doc = frame?.contentDocument;
-    if (!doc) return;
+    if (!frame?.contentWindow) return;
     try {
-      doc.documentElement.dataset.theme = nextTheme;
-      const nav = doc.querySelector<HTMLButtonElement>(`button[data-page-target="${page}"]`);
-      if (nav && !nav.classList.contains('active')) nav.click();
-      const frameWindow = frame.contentWindow;
-      if (frameWindow) {
-        // Re-run the original chart resize/theme listener so custom charts keep
-        // their existing dimensions and colour tokens after a theme change.
-        const resizeEvent = frameWindow.document.createEvent('Event');
-        resizeEvent.initEvent('resize', true, false);
-        frameWindow.dispatchEvent(resizeEvent);
-        frameWindow.scrollTo({ top: 0, behavior: 'auto' });
-      }
+      // Hash navigation is explicitly allowed across origins and the legacy
+      // workspace already maps its hash to the existing page router.
+      frame.contentWindow.location.hash = page;
+      // Theme synchronization uses the small, origin-checked bridge added to
+      // the backend. If the deployed backend is older, the shell remains usable.
+      frame.contentWindow.postMessage({ type: 'nifty-lab:sync', page, theme: nextTheme }, API_BASE_URL || window.location.origin);
       setFrameError(false);
     } catch {
       setFrameError(true);
@@ -99,7 +96,7 @@ export default function App() {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 4500);
     try {
-      const response = await fetch('/api/health', { signal: controller.signal, cache: 'no-store' });
+      const response = await fetch(`${API_BASE_URL}/api/health`, { signal: controller.signal, cache: 'no-store' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const payload: unknown = await response.json();
       if (payload && typeof payload === 'object' && 'status' in payload && payload.status === 'ok') {
@@ -273,7 +270,7 @@ export default function App() {
               ref={iframeRef}
               className="workspace-frame"
               title="NIFTY LAB protected feature workspace"
-              src="/workspace"
+              src={`${API_BASE_URL}/workspace`}
               onLoad={() => syncWorkspace(activePage, theme)}
               onError={() => setFrameError(true)}
             />

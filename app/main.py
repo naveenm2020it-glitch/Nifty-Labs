@@ -173,6 +173,22 @@ def legacy_workspace():
 """
     chart_bridge = r"""
 <script>
+window.addEventListener('message', function (event) {
+  if (event.source !== window.parent) return;
+  const trustedParentOrigins = [window.location.origin, 'capacitor://localhost', 'http://localhost', 'https://localhost'];
+  if (!trustedParentOrigins.includes(event.origin)) return;
+  const message = event.data;
+  if (!message || message.type !== 'nifty-lab:sync') return;
+  if (message.theme === 'light' || message.theme === 'dark') {
+    document.documentElement.dataset.theme = message.theme;
+  }
+  if (typeof message.page === 'string') {
+    const nav = document.querySelector('button[data-page-target="' + message.page.replace(/[^a-z-]/g, '') + '"]');
+    if (nav && !nav.classList.contains('active')) nav.click();
+  }
+  window.dispatchEvent(new Event('resize'));
+  window.scrollTo({ top: 0, behavior: 'auto' });
+});
 window.__niftyLabGetSpotChartState = function () {
   const selectedDate = sr$('spotChartDate')?.value || '';
   const overviewLevels = current && current.support_resistance && ['S1','S2','R1','R2'].every(k =>
