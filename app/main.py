@@ -202,12 +202,14 @@ def home():
     return LEGACY_HTML_PATH.read_text(encoding="utf-8")
 
 @app.get("/api/nifty/day-range")
-def nifty_day_range():
-    """Return the current NSE NIFTY 50 session high/low and Mangesh distance."""
+def nifty_day_range(trade_date: date):
+    """Return historical NIFTY 50 high/low for the exact selected trading date."""
     try:
-        return fetch_nifty_day_range_api()
+        return fetch_nifty_day_range_api(trade_date)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
     except Exception as exc:
-        raise HTTPException(502, f"Could not fetch today's NIFTY 50 high/low from NSE: {type(exc).__name__}: {exc}") from exc
+        raise HTTPException(502, f"Could not fetch NIFTY 50 high/low for {trade_date.isoformat()} from NSE historical index data: {type(exc).__name__}: {exc}") from exc
 
 @app.get("/api/health")
 def health():
