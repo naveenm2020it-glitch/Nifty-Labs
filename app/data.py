@@ -176,67 +176,35 @@ def _records_from_json(payload):
     return []
 
 
-def fetch_nifty_day_range_api(timeout: int = 20) -> dict:
-    """Fetch a verified NIFTY 50 intraday high/low from NSE public quote APIs.
-
-    NSE's all-indices response can occasionally return an unusable flat pair.
-    Do not turn that response into a misleading zero-point Mangesh distance:
-    try the dedicated NIFTY 50 index quote endpoint before reporting failure.
-    """
+def fetch_nifty_day_range_api(trade_date: date, timeout: int = 20) -> dict:
+    """Fetch NIFTY 50 historical daily high/low for the exact selected session."""
+    if trade_date > date.today():
+        raise ValueError("Selected trading date cannot be in the future.")
     session = _api_session(timeout)
-    endpoints = [
-        ("https://www.nseindia.com/api/allIndices", {}, "NSE public all-indices quote API"),
-        ("https://www.nseindia.com/api/equity-stockIndices",
-         {"index": "NIFTY 50"}, "NSE public NIFTY 50 index quote API"),
-    ]
-    errors = []
-    for url, params, source in endpoints:
-        try:
-            response = session.get(url, params=params, timeout=timeout)
-            response.raise_for_status()
-            records = _records_from_json(response.json())
-        except Exception as exc:
-            errors.append(f"{url.rsplit('/', 1)[-1]}: {type(exc).__name__}: {exc}")
+    params = {"indexType": "NIFTY 50", "from": trade_date.strftime("%d-%m-%Y"), "to": trade_date.strftime("%d-%m-%Y")}
+    url = "https://www.nseindia.com/api/historicalOR/indicesHistory"
+    response = session.get(url, params=params, timeout=timeout)
+    response.raise_for_status()
+    records = _records_from_json(response.json())
+    for rec in records:
+        if not isinstance(rec, dict):
             continue
-        for rec in records:
-            if not isinstance(rec, dict):
-                continue
-            normalized = {
-                str(k).lower().replace("_", "").replace(" ", "").replace("-", ""): v
-                for k, v in rec.items()
-            }
-            name = str(normalized.get("index", normalized.get("indexname", ""))).strip().upper()
-            # The dedicated quote endpoint may wrap its sole index row without an index name.
-            if name and name not in {"NIFTY 50", "NIFTY50"}:
-                continue
-            high = next((normalized[k] for k in
-                         ("high", "dayhigh", "indexhigh", "intraDayHigh".lower())
-                         if normalized.get(k) not in (None, "", "-")), None)
-            low = next((normalized[k] for k in
-                        ("low", "daylow", "indexlow", "intraDayLow".lower())
-                        if normalized.get(k) not in (None, "", "-")), None)
-            try:
-                high_value = float(str(high).replace(",", ""))
-                low_value = float(str(low).replace(",", ""))
-            except (TypeError, ValueError):
-                continue
-            # A full NIFTY 50 session should have a non-zero range. Equal values
-            # indicate a stale/partial quote and must never be presented as 0 pts.
-            if high_value <= 0 or low_value <= 0 or high_value < low_value or high_value == low_value:
-                continue
-            return {
-                "index": "NIFTY 50", "high": high_value, "low": low_value,
-                "distance": round((high_value - low_value) * 0.2611, 2),
-                "as_of": normalized.get("timestamp", normalized.get("time", "")),
-                "source": source,
-                "formula": "(Today's NIFTY High - Today's NIFTY Low) × 26.11%",
-            }
-        errors.append(f"{url.rsplit('/', 1)[-1]}: no valid NIFTY 50 high/low range")
-    raise RuntimeError(
-        "NSE did not provide a valid NIFTY 50 intraday high/low range. "
-        "A flat high/low quote is rejected instead of displaying a false 0.00-point distance. "
-        + " | ".join(errors)
-    )
+        normalized = {str(k).lower().replace("_", "").replace(" ", "").replace("-", ""): v for k, v in rec.items()}
+        name = str(normalized.get("eodindexname", normalized.get("indexname", normalized.get("index", "")))).strip().upper()
+        if name and name not in {"NIFTY 50", "NIFTY50"}:
+            continue
+        high = next((normalized[k] for k in ("eodhighindexval", "highindexval", "dayhigh", "high") if normalized.get(k) not in (None, "", "-")), None)
+        low = next((normalized[k] for k in ("eodlowindexval", "lowindexval", "daylow", "low") if normalized.get(k) not in (None, "", "-")), None)
+        try:
+            high_value, low_value = float(str(high).replace(",", "")), float(str(low).replace(",", ""))
+        except (TypeError, ValueError):
+            continue
+        if high_value <= 0 or low_value <= 0 or high_value <= low_value:
+            continue
+        return {"index": "NIFTY 50", "trade_date": trade_date.isoformat(), "high": high_value, "low": low_value,
+                "distance": round((high_value - low_value) * 0.2611, 2), "source": "NSE historical index API",
+                "formula": "(Selected date NIFTY High - Selected date NIFTY Low) × 26.11%"}
+    raise RuntimeError(f"NSE historical index API did not return a valid NIFTY 50 high/low range for {trade_date.isoformat()}.")
 
 def fetch_nifty_close_api(trade_date: date, symbol: str = "NIFTY", timeout: int = 20) -> tuple[float, str]:
     """Best-effort NSE historical index API lookup for the NIFTY 50 close."""
